@@ -7,7 +7,8 @@
     <meta name="theme-color" content="#173d34">
     <title>Денисова и партнеры | Обучение брокеров недвижимости</title>
     <script>document.documentElement.classList.add("js");</script>
-    <link rel="stylesheet" href="styles.css?v=20260722-mobile">
+    <script src="https://forma.tbank.ru/static/onlineScript.js"></script>
+    <link rel="stylesheet" href="styles.css?v=20260803-installment">
   </head>
   <body>
     <a class="skip-link" href="#main">Перейти к содержанию</a>
@@ -299,9 +300,50 @@
             </article>
           </div>
 
+          <div class="installment-tool reveal" data-installment>
+            <div class="installment-copy">
+              <p class="installment-eyebrow">Оплата частями</p>
+              <h3>Рассрочка от Т-Банка</h3>
+              <p>Выберите тариф и срок. Анкета откроется на защищенной странице банка.</p>
+            </div>
+
+            <div class="installment-controls">
+              <label class="installment-field">
+                <span>Тариф</span>
+                <select data-installment-plan>
+                  <option value="standard" data-price="5000">Стандарт · 5 000 ₽</option>
+                  <option value="premium" data-price="15000">Премиум · 15 000 ₽</option>
+                </select>
+              </label>
+
+              <label class="installment-field">
+                <span>Срок</span>
+                <select data-installment-term>
+                  <option value="installment_0_0_3_5" data-months="3">3 месяца</option>
+                  <option value="installment_0_0_4_6,2" data-months="4">4 месяца</option>
+                  <option value="installment_0_0_6_8,6" data-months="6">6 месяцев</option>
+                  <option value="installment_0_0_10_13,1" data-months="10">10 месяцев</option>
+                  <option value="installment_0_0_12_15,2" data-months="12">12 месяцев</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="installment-summary">
+              <div class="installment-payment" aria-live="polite">
+                <span>Ориентировочный платеж</span>
+                <strong><span data-installment-monthly>1 667</span> ₽ <small>/ месяц</small></strong>
+                <p data-installment-caption>Тариф «Стандарт» на 3 месяца</p>
+              </div>
+
+              <div class="tbank-button-host" data-tbank-button-host></div>
+              <p class="installment-fallback" data-tbank-fallback hidden>Форма банка не загрузилась. Обновите страницу или <a href="https://t.me/IvanMakeBusiness" target="_blank" rel="noopener">напишите в Telegram</a>.</p>
+              <p class="installment-disclaimer">Расчет предварительный. Решение по заявке и итоговые условия определяет Т-Банк.</p>
+            </div>
+          </div>
+
           <div class="pricing-action reveal">
-            <p>Есть рассрочка через Т-Банк до трех лет с платежом примерно 500–1 200 ₽ в месяц.</p>
-            <a class="button button-primary" href="#application">Обсудить тариф</a>
+            <p>Тариф «Эконом» оплачивается сразу. Стандарт и Премиум можно оформить в рассрочку.</p>
+            <a class="button button-secondary" href="#application">Сначала обсудить тариф</a>
           </div>
         </div>
       </section>
@@ -417,6 +459,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260721-v2"></script>
+    <script src="script.js?v=20260803-installment"></script>
   </body>
 </html>

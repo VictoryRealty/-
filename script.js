@@ -215,6 +215,69 @@
     });
   }
 
+  const installment = document.querySelector("[data-installment]");
+
+  if (installment) {
+    const planSelect = installment.querySelector("[data-installment-plan]");
+    const termSelect = installment.querySelector("[data-installment-term]");
+    const monthlyValue = installment.querySelector("[data-installment-monthly]");
+    const caption = installment.querySelector("[data-installment-caption]");
+    const buttonHost = installment.querySelector("[data-tbank-button-host]");
+    const fallback = installment.querySelector("[data-tbank-fallback]");
+    const shopId = "71b6f5de-46e6-4695-b4cd-bdeada85e12a";
+    const showcaseId = "775b4264-5a84-4296-9493-ec699aa1999e";
+    const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
+
+    const updateInstallment = () => {
+      const planOption = planSelect?.selectedOptions[0];
+      const termOption = termSelect?.selectedOptions[0];
+      if (!planOption || !termOption || !buttonHost) return;
+
+      const price = Number(planOption.dataset.price);
+      const months = Number(termOption.dataset.months);
+      const promoCode = termOption.value;
+      const planName = planOption.value === "premium" ? "Премиум" : "Стандарт";
+      const monthly = Math.ceil(price / months);
+      const productName = `Обучение профессии брокера — тариф ${planName}`;
+      const paymentData = new URLSearchParams({
+        "items.0.name": productName,
+        "items.0.price": String(price),
+        "items.0.quantity": "1",
+        promoCode,
+        sum: String(price),
+      });
+
+      if (monthlyValue) monthlyValue.textContent = rubles.format(monthly);
+      if (caption) {
+        const monthWord = months === 3 || months === 4 ? "месяца" : "месяцев";
+        caption.textContent = `Тариф «${planName}» на ${months} ${monthWord}`;
+      }
+
+      const bankButton = document.createElement("tinkoff-create-button");
+      bankButton.setAttribute("size", "M");
+      bankButton.setAttribute("subtext", `≈ ${rubles.format(monthly)} ₽ в месяц`);
+      bankButton.setAttribute("shopId", shopId);
+      bankButton.setAttribute("showcaseId", showcaseId);
+      bankButton.setAttribute("ui-data", "view=newTab");
+      bankButton.setAttribute("payment-data", paymentData.toString());
+      buttonHost.replaceChildren(bankButton);
+    };
+
+    planSelect?.addEventListener("change", updateInstallment);
+    termSelect?.addEventListener("change", updateInstallment);
+    updateInstallment();
+
+    window.setTimeout(() => {
+      if (!window.customElements?.get("tinkoff-create-button") && fallback) {
+        fallback.hidden = false;
+      }
+    }, 6000);
+
+    window.customElements?.whenDefined("tinkoff-create-button").then(() => {
+      if (fallback) fallback.hidden = true;
+    });
+  }
+
   const modal = document.querySelector("[data-video-modal]");
   const dialog = modal?.querySelector("[data-video-dialog]");
   const player = modal?.querySelector(".video-player");
