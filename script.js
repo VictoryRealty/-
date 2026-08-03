@@ -239,13 +239,13 @@
       const planName = planOption.value === "premium" ? "Премиум" : "Стандарт";
       const monthly = Math.ceil(price / months);
       const productName = `Обучение профессии брокера — тариф ${planName}`;
-      const paymentData = new URLSearchParams({
+      const productData = new URLSearchParams({
         "items.0.name": productName,
         "items.0.price": String(price),
         "items.0.quantity": "1",
-        promoCode,
         sum: String(price),
       });
+      const paymentData = `${productData.toString()}&promoCode=${promoCode}`;
 
       if (monthlyValue) monthlyValue.textContent = rubles.format(monthly);
       if (caption) {
@@ -259,7 +259,7 @@
       bankButton.setAttribute("shopId", shopId);
       bankButton.setAttribute("showcaseId", showcaseId);
       bankButton.setAttribute("ui-data", "view=newTab");
-      bankButton.setAttribute("payment-data", paymentData.toString());
+      bankButton.setAttribute("payment-data", paymentData);
       buttonHost.replaceChildren(bankButton);
     };
 
