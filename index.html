@@ -7,7 +7,7 @@
     <title>Денисова и партнеры | Обучение брокеров недвижимости</title>
     <meta name="payment-api" content="https://victory-payment.155-212-143-159.sslip.io">
     <script src="https://forma.tbank.ru/static/onlineScript.js"></script>
-    <link rel="stylesheet" href="styles.css?v=20260815-payment-installment-mobile">
+    <link rel="stylesheet" href="styles.css?v=20260815-mobile-restore-v3">
   </head>
   <body>
     <a class="skip-link" href="#main">Перейти к содержанию</a>
@@ -64,7 +64,7 @@
           <a href="#client-role">Кому подходит</a>
           <a href="#broker-stack">Что входит</a>
           <a href="#trust">Практика</a>
-          <a href="#pricing">Тарифы</a>
+          <a href="#pricing">Оплата</a>
           <a href="#faq">FAQ</a>
         </nav>
 
@@ -93,7 +93,7 @@
                 Оставить заявку
                 <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
               </a>
-              <a class="button button--secondary" href="#first-clients">Как проходит старт</a>
+              <a class="button button--secondary" href="#pricing">Тарифы и оплата</a>
             </div>
 
             <div class="trust-strip" aria-label="Ключевые условия">
@@ -504,9 +504,9 @@
         <div class="container">
           <div class="pricing-head reveal">
             <div class="section-heading">
-              <p class="eyebrow">Тарифы</p>
-              <h2>Три уровня поддержки — от самостоятельного старта до личного сопровождения</h2>
-              <p>Оплата идет за систему, материалы и сопровождение. После выбора тарифа вы укажете почту и телефон для чека, затем перейдете на защищенную платежную страницу Т-Банка.</p>
+              <p class="eyebrow">Оплата и рассрочка</p>
+              <h2>Выберите тариф и способ оплаты</h2>
+              <p>Оплатите картой сразу или оформите рассрочку Т-Банка на 3, 6 или 12 месяцев.</p>
             </div>
           </div>
 
@@ -517,9 +517,19 @@
             </div>
             <div class="roi-strip__example">
               <span>Пример расчета комиссии</span>
-              <strong>5 млн ₽ × 2% × 50% = 50 000 ₽</strong>
-              <small>Расчет ориентировочный и не гарантирует доход. Итог зависит от объекта, условий сделки и модели сотрудничества.</small>
+              <strong>10 млн ₽ × 3% × 50% = 150 000 ₽</strong>
+              <small>В одном из кейсов первая сделка на объект 10 млн ₽ состоялась на 10-й день обучения. Расчет ориентировочный и не гарантирует доход.</small>
             </div>
+          </div>
+
+          <div class="pricing-shortcuts reveal" aria-label="Быстрый выбор способа оплаты тарифа Стандарт">
+            <button class="button button--primary" type="button" data-payment-open data-plan="standard" aria-haspopup="dialog" aria-controls="payment-dialog">
+              Оплатить «Стандарт» · 5 000 ₽
+              <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
+            </button>
+            <button class="button button--secondary" type="button" data-installment-open data-plan="standard" aria-haspopup="dialog" aria-controls="installment-dialog">
+              Рассрочка 3 / 6 / 12 мес.
+            </button>
           </div>
 
           <div class="tariff-grid reveal">
