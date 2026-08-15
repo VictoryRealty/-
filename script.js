@@ -14,6 +14,10 @@ const videoCloseButtons = document.querySelectorAll("[data-video-close]");
 const modalVideo = videoModal?.querySelector("video");
 const modalVideoTitle = videoModal?.querySelector("[data-video-title]");
 const modalDialog = videoModal?.querySelector("[data-video-dialog]");
+const mobileDock = document.querySelector("[data-mobile-dock]");
+const mobileDockLinks = mobileDock?.querySelectorAll("a") || [];
+const applicationSection = document.querySelector("#application");
+const mobileViewport = window.matchMedia("(max-width: 680px)");
 let lastVideoTrigger = null;
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -22,18 +26,45 @@ const submitButton = form?.querySelector("button[type='submit']");
 const submitLabel = submitButton?.querySelector("[data-submit-label]");
 const paymentApiBase = String(document.querySelector('meta[name="payment-api"]')?.content || "").replace(/\/$/, "");
 
+function setMobileDockState() {
+  if (!mobileDock) return;
+
+  const applicationRect = applicationSection?.getBoundingClientRect();
+  const applicationInView = Boolean(
+    applicationRect && applicationRect.top < window.innerHeight * 0.78 && applicationRect.bottom > 0
+  );
+  const menuIsOpen = nav?.classList.contains("is-open");
+  const isVisible = mobileViewport.matches
+    && window.scrollY > Math.max(460, window.innerHeight * 0.66)
+    && !applicationInView
+    && !menuIsOpen;
+
+  mobileDock.classList.toggle("is-visible", isVisible);
+  mobileDock.setAttribute("aria-hidden", String(!isVisible));
+  mobileDockLinks.forEach((link) => {
+    if (isVisible) {
+      link.removeAttribute("tabindex");
+    } else {
+      link.setAttribute("tabindex", "-1");
+    }
+  });
+}
+
 function setHeaderState() {
   header?.classList.toggle("is-scrolled", window.scrollY > 12);
+  setMobileDockState();
 }
 
 setHeaderState();
 window.addEventListener("scroll", setHeaderState, { passive: true });
+window.addEventListener("resize", setHeaderState);
 
 menuButton?.addEventListener("click", () => {
   const isOpen = menuButton.getAttribute("aria-expanded") === "true";
   menuButton.setAttribute("aria-expanded", String(!isOpen));
   menuButton.classList.toggle("is-open", !isOpen);
   nav?.classList.toggle("is-open", !isOpen);
+  setMobileDockState();
 });
 
 nav?.addEventListener("click", (event) => {
@@ -41,6 +72,7 @@ nav?.addEventListener("click", (event) => {
     menuButton?.setAttribute("aria-expanded", "false");
     menuButton?.classList.remove("is-open");
     nav.classList.remove("is-open");
+    setMobileDockState();
   }
 });
 
