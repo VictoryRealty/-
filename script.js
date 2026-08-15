@@ -1,343 +1,343 @@
-(() => {
-  "use strict";
+const header = document.querySelector("[data-header]");
+const menuButton = document.querySelector("[data-menu-button]");
+const nav = document.querySelector("#main-nav");
+const revealItems = document.querySelectorAll(".reveal");
+const form = document.querySelector("[data-lead-form]");
+const formError = document.querySelector("[data-form-error]");
+const formSuccess = document.querySelector("[data-form-success]");
+const toast = document.querySelector("[data-toast]");
+const channelSelect = document.querySelector("[data-channel-select]");
+const channelButtons = document.querySelectorAll("[data-channel]");
+const videoButtons = document.querySelectorAll("[data-video-button]");
+const videoModal = document.querySelector("[data-video-modal]");
+const videoCloseButtons = document.querySelectorAll("[data-video-close]");
+const modalVideo = videoModal?.querySelector("video");
+const modalVideoTitle = videoModal?.querySelector("[data-video-title]");
+const modalDialog = videoModal?.querySelector("[data-video-dialog]");
+let lastVideoTrigger = null;
 
-  const header = document.querySelector("[data-header]");
-  const menuButton = document.querySelector("[data-menu-button]");
-  const mainNav = document.querySelector("#main-nav");
-  const menuLabel = menuButton?.querySelector(".sr-only");
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const leadEndpoint = "https://formsubmit.co/ajax/batuninivan3@gmail.com";
+const submitButton = form?.querySelector("button[type='submit']");
+const submitLabel = submitButton?.querySelector("[data-submit-label]");
+const paymentApiBase = String(document.querySelector('meta[name="payment-api"]')?.content || "").replace(/\/$/, "");
 
-  const setMenu = (open) => {
-    if (!header || !menuButton) return;
-    header.classList.toggle("is-open", open);
-    document.body.classList.toggle("menu-open", open);
-    menuButton.setAttribute("aria-expanded", String(open));
-    if (menuLabel) menuLabel.textContent = open ? "Закрыть меню" : "Открыть меню";
-  };
+function setHeaderState() {
+  header?.classList.toggle("is-scrolled", window.scrollY > 12);
+}
 
-  const updateHeader = () => {
-    header?.classList.toggle("is-scrolled", window.scrollY > 18);
-  };
+setHeaderState();
+window.addEventListener("scroll", setHeaderState, { passive: true });
 
-  updateHeader();
-  window.addEventListener("scroll", updateHeader, { passive: true });
+menuButton?.addEventListener("click", () => {
+  const isOpen = menuButton.getAttribute("aria-expanded") === "true";
+  menuButton.setAttribute("aria-expanded", String(!isOpen));
+  menuButton.classList.toggle("is-open", !isOpen);
+  nav?.classList.toggle("is-open", !isOpen);
+});
 
-  menuButton?.addEventListener("click", () => {
-    setMenu(menuButton.getAttribute("aria-expanded") !== "true");
-  });
+nav?.addEventListener("click", (event) => {
+  if (event.target instanceof HTMLAnchorElement) {
+    menuButton?.setAttribute("aria-expanded", "false");
+    menuButton?.classList.remove("is-open");
+    nav.classList.remove("is-open");
+  }
+});
 
-  mainNav?.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => setMenu(false));
-  });
-
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 980) setMenu(false);
-  });
-
-  const revealItems = [...document.querySelectorAll(".reveal")];
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  if (reduceMotion || !("IntersectionObserver" in window)) {
-    revealItems.forEach((item) => item.classList.add("is-visible"));
-  } else {
-    const revealObserver = new IntersectionObserver(
-      (entries, observer) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
+if ("IntersectionObserver" in window && !prefersReducedMotion) {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
           entry.target.classList.add("is-visible");
           observer.unobserve(entry.target);
-        });
-      },
-      { rootMargin: "0px 0px -8%", threshold: 0.08 }
-    );
-    revealItems.forEach((item) => revealObserver.observe(item));
-  }
-
-  const animatedDetails = [
-    ...document.querySelectorAll(".system-list details, .faq-list details"),
-  ];
-  const detailsAnimations = new WeakMap();
-
-  const setDetailsState = (detail, shouldOpen) => {
-    const summary = detail.querySelector("summary");
-    if (!summary) return;
-
-    if (reduceMotion || typeof detail.animate !== "function") {
-      detail.open = shouldOpen;
-      return;
-    }
-
-    const activeAnimation = detailsAnimations.get(detail);
-    const startHeight = detail.getBoundingClientRect().height;
-    activeAnimation?.cancel();
-
-    if (shouldOpen) {
-      detail.open = true;
-      detail.style.height = "auto";
-    }
-
-    const endHeight = shouldOpen
-      ? detail.getBoundingClientRect().height
-      : summary.getBoundingClientRect().height;
-
-    detail.style.height = `${startHeight}px`;
-    detail.classList.add("is-animating");
-    detail.dataset.animatingTo = shouldOpen ? "open" : "closed";
-
-    const animation = detail.animate(
-      { height: [`${startHeight}px`, `${endHeight}px`] },
-      {
-        duration: shouldOpen ? 360 : 280,
-        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-      }
-    );
-
-    detailsAnimations.set(detail, animation);
-    animation.addEventListener("finish", () => {
-      if (!shouldOpen) detail.open = false;
-      detail.style.height = "";
-      detail.classList.remove("is-animating");
-      delete detail.dataset.animatingTo;
-      detailsAnimations.delete(detail);
-    });
-  };
-
-  animatedDetails.forEach((detail) => {
-    const summary = detail.querySelector("summary");
-    summary?.addEventListener("click", (event) => {
-      event.preventDefault();
-
-      const currentTarget = detail.dataset.animatingTo;
-      const shouldOpen = currentTarget ? currentTarget !== "open" : !detail.open;
-
-      if (shouldOpen) {
-        const group = detail.closest("[data-exclusive-details]");
-        group?.querySelectorAll("details").forEach((other) => {
-          if (other !== detail && (other.open || other.dataset.animatingTo === "open")) {
-            setDetailsState(other, false);
-          }
-        });
-      }
-
-      setDetailsState(detail, shouldOpen);
-    });
-  });
-
-  const toast = document.querySelector("[data-toast]");
-  let toastTimer;
-
-  const showToast = (message) => {
-    if (!toast) return;
-    window.clearTimeout(toastTimer);
-    toast.textContent = message;
-    toast.classList.add("is-visible");
-    toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 3200);
-  };
-
-  const form = document.querySelector("[data-lead-form]");
-
-  if (form) {
-    const nameInput = form.querySelector("[name='name']");
-    const phoneInput = form.querySelector("[name='phone']");
-    const errorMessage = form.querySelector("[data-form-error]");
-    const successMessage = form.querySelector("[data-form-success]");
-    const submitButton = form.querySelector("button[type='submit']");
-    const submitLabel = form.querySelector("[data-submit-label]");
-
-    const setInvalid = (input, invalid) => {
-      input?.setAttribute("aria-invalid", String(invalid));
-    };
-
-    const clearFieldError = (event) => {
-      setInvalid(event.currentTarget, false);
-      if (errorMessage) errorMessage.textContent = "";
-    };
-
-    nameInput?.addEventListener("input", clearFieldError);
-    phoneInput?.addEventListener("input", clearFieldError);
-
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      const name = nameInput?.value.trim() || "";
-      const phone = phoneInput?.value.trim() || "";
-      const phoneDigits = phone.replace(/\D/g, "");
-      const invalidName = name.length < 2;
-      const invalidPhone = phoneDigits.length < 10;
-
-      setInvalid(nameInput, invalidName);
-      setInvalid(phoneInput, invalidPhone);
-      if (successMessage) successMessage.textContent = "";
-
-      if (invalidName || invalidPhone) {
-        if (errorMessage) {
-          errorMessage.textContent = invalidName
-            ? "Укажите имя, чтобы мы знали, как к вам обращаться."
-            : "Проверьте номер телефона: нужно не меньше 10 цифр.";
         }
-        (invalidName ? nameInput : phoneInput)?.focus();
-        return;
-      }
-
-      if (errorMessage) errorMessage.textContent = "";
-      if (submitButton) submitButton.disabled = true;
-      if (submitLabel) submitLabel.textContent = "Отправляем…";
-
-      const payload = new FormData(form);
-      payload.append("_subject", "Новая заявка с сайта Денисова и партнеры");
-      payload.append("_template", "table");
-      payload.append("_captcha", "false");
-      payload.append("source", window.location.href);
-
-      try {
-        const response = await fetch("https://formsubmit.co/ajax/batuninivan3@gmail.com", {
-          method: "POST",
-          headers: { Accept: "application/json" },
-          body: payload,
-        });
-
-        if (!response.ok) throw new Error(`Request failed: ${response.status}`);
-
-        form.querySelectorAll("input, select, textarea").forEach((field) => {
-          field.disabled = true;
-        });
-        if (submitLabel) submitLabel.textContent = "Спасибо за отклик";
-        if (successMessage) {
-          successMessage.textContent = "Заявка отправлена. С вами свяжутся по выбранному каналу.";
-        }
-        showToast("Заявка отправлена. Спасибо за отклик.");
-      } catch (error) {
-        if (submitButton) submitButton.disabled = false;
-        if (submitLabel) submitLabel.textContent = "Повторить отправку";
-        if (errorMessage) {
-          errorMessage.textContent = "Не получилось отправить заявку. Попробуйте еще раз или напишите в Telegram.";
-        }
-      }
-    });
-  }
-
-  const installment = document.querySelector("[data-installment]");
-
-  if (installment) {
-    const planSelect = installment.querySelector("[data-installment-plan]");
-    const termSelect = installment.querySelector("[data-installment-term]");
-    const monthlyValue = installment.querySelector("[data-installment-monthly]");
-    const caption = installment.querySelector("[data-installment-caption]");
-    const buttonHost = installment.querySelector("[data-tbank-button-host]");
-    const fallback = installment.querySelector("[data-tbank-fallback]");
-    const shopId = "71b6f5de-46e6-4695-b4cd-bdeada85e12a";
-    const showcaseId = "775b4264-5a84-4296-9493-ec699aa1999e";
-    const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
-
-    const updateInstallment = () => {
-      const planOption = planSelect?.selectedOptions[0];
-      const termOption = termSelect?.selectedOptions[0];
-      if (!planOption || !termOption || !buttonHost) return;
-
-      const price = Number(planOption.dataset.price);
-      const months = Number(termOption.dataset.months);
-      const promoCode = termOption.value;
-      const planName = planOption.value === "premium" ? "Премиум" : "Стандарт";
-      const monthly = Math.ceil(price / months);
-      const productName = `Обучение профессии брокера — тариф ${planName}`;
-      const productData = new URLSearchParams({
-        "items.0.name": productName,
-        "items.0.price": String(price),
-        "items.0.quantity": "1",
-        sum: String(price),
       });
-      const paymentData = `${productData.toString()}&promoCode=${promoCode}`;
+    },
+    { threshold: 0.16, rootMargin: "0px 0px -70px 0px" }
+  );
 
-      if (monthlyValue) monthlyValue.textContent = rubles.format(monthly);
-      if (caption) {
-        const monthWord = months === 3 || months === 4 ? "месяца" : "месяцев";
-        caption.textContent = `Тариф «${planName}» на ${months} ${monthWord}`;
-      }
+  revealItems.forEach((item, index) => {
+    item.style.transitionDelay = `${Math.min(index % 6, 5) * 55}ms`;
+    observer.observe(item);
+  });
+} else {
+  revealItems.forEach((item) => item.classList.add("is-visible"));
+}
 
-      const bankButton = document.createElement("tinkoff-create-button");
-      bankButton.setAttribute("size", "M");
-      bankButton.setAttribute("subtext", `≈ ${rubles.format(monthly)} ₽ в месяц`);
-      bankButton.setAttribute("shopId", shopId);
-      bankButton.setAttribute("showcaseId", showcaseId);
-      bankButton.setAttribute("ui-data", "view=newTab");
-      bankButton.setAttribute("payment-data", paymentData);
-      buttonHost.replaceChildren(bankButton);
-    };
+function showToast(message) {
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add("is-visible");
+  window.clearTimeout(showToast.timer);
+  showToast.timer = window.setTimeout(() => {
+    toast.classList.remove("is-visible");
+  }, 4200);
+}
 
-    planSelect?.addEventListener("change", updateInstallment);
-    termSelect?.addEventListener("change", updateInstallment);
-    updateInstallment();
+form?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const data = new FormData(form);
+  const name = String(data.get("name") || "").trim();
+  const phone = String(data.get("phone") || "").trim();
+  const channel = String(data.get("channel") || "Telegram").trim();
+  const experience = String(data.get("experience") || "").trim();
 
-    window.setTimeout(() => {
-      if (!window.customElements?.get("tinkoff-create-button") && fallback) {
-        fallback.hidden = false;
-      }
-    }, 6000);
-
-    window.customElements?.whenDefined("tinkoff-create-button").then(() => {
-      if (fallback) fallback.hidden = true;
-    });
+  if (!name || !phone) {
+    if (formError) formError.textContent = "Заполните имя и телефон, чтобы мы могли связаться с вами.";
+    if (formSuccess) formSuccess.textContent = "";
+    const firstInvalid = form.querySelector(!name ? "[name='name']" : "[name='phone']");
+    firstInvalid?.focus();
+    return;
   }
 
-  const modal = document.querySelector("[data-video-modal]");
-  const dialog = modal?.querySelector("[data-video-dialog]");
-  const player = modal?.querySelector(".video-player");
-  const modalTitle = modal?.querySelector("[data-video-title]");
-  const closeButtons = modal?.querySelectorAll("[data-video-close]") || [];
-  let lastVideoTrigger = null;
+  if (formError) formError.textContent = "";
+  if (formSuccess) formSuccess.textContent = "";
+  if (submitButton) submitButton.disabled = true;
+  if (submitLabel) submitLabel.textContent = "Отправляем...";
 
-  const closeVideo = () => {
-    if (!modal || !player) return;
-    modal.classList.remove("is-open");
-    modal.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("modal-open");
-    player.pause();
-    player.removeAttribute("src");
-    player.removeAttribute("poster");
-    player.load();
-    lastVideoTrigger?.focus();
+  const payload = {
+    name,
+    phone,
+    channel,
+    experience: experience || "Не указан",
+    source: window.location.href,
+    submittedAt: new Date().toLocaleString("ru-RU"),
+    _subject: "Новая бронь на обучение брокеров",
+    _template: "table",
+    _captcha: "false"
   };
 
-  document.querySelectorAll("[data-video-button]").forEach((button) => {
-    button.addEventListener("click", () => {
-      if (!modal || !player) return;
-      lastVideoTrigger = button;
-      player.src = button.dataset.videoSrc || "";
-      player.poster = button.dataset.videoPoster || "";
-      if (modalTitle) modalTitle.textContent = button.dataset.videoTitle || "Видео";
-      modal.classList.add("is-open");
-      modal.setAttribute("aria-hidden", "false");
-      document.body.classList.add("modal-open");
-      modal.querySelector(".video-close")?.focus();
-      player.play().catch(() => {});
+  fetch(leadEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify(payload)
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("Lead request failed");
+      form.reset();
+      if (channelSelect) channelSelect.value = "Telegram";
+      form.classList.add("is-submitted");
+      form.querySelectorAll("input, select, textarea").forEach((field) => {
+        field.disabled = true;
+      });
+      if (submitLabel) submitLabel.textContent = "Спасибо за отклик";
+      if (formSuccess) formSuccess.textContent = "Заявка отправлена. Мы свяжемся с вами в ближайшее время.";
+      showToast("Заявка отправлена.");
+    })
+    .catch(() => {
+      if (submitButton) submitButton.disabled = false;
+      if (submitLabel) submitLabel.textContent = "Оставить заявку";
+      if (formError) formError.textContent = "Не получилось отправить заявку. Попробуйте еще раз или напишите в Telegram.";
     });
-  });
+});
 
-  closeButtons.forEach((button) => button.addEventListener("click", closeVideo));
-
-  dialog?.addEventListener("keydown", (event) => {
-    if (event.key !== "Tab") return;
-    const focusable = [...dialog.querySelectorAll("button, video[controls]")].filter(
-      (item) => !item.hasAttribute("disabled")
-    );
-    if (!focusable.length) return;
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
+channelButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const channel = button.dataset.channel;
+    if (channelSelect && channel) {
+      channelSelect.value = channel;
     }
+    document.querySelector("#application")?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth" });
+    window.setTimeout(() => {
+      form?.querySelector("[name='name']")?.focus();
+    }, prefersReducedMotion ? 0 : 420);
   });
+});
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
-    if (modal?.classList.contains("is-open")) {
-      closeVideo();
-    } else if (header?.classList.contains("is-open")) {
-      setMenu(false);
-      menuButton?.focus();
+function openVideoModal(trigger) {
+  if (!videoModal || !modalVideo) return;
+  const source = trigger.dataset.videoSrc;
+  if (!source) return;
+
+  lastVideoTrigger = trigger;
+  modalVideo.src = source;
+  modalVideo.poster = trigger.dataset.videoPoster || "";
+  if (modalVideoTitle) modalVideoTitle.textContent = trigger.dataset.videoTitle || "Видео";
+  if (modalDialog) modalDialog.setAttribute("aria-label", trigger.dataset.videoTitle || "Видео о практике обучения");
+  videoModal.classList.add("is-open");
+  videoModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+  videoModal.querySelector("button")?.focus();
+  modalVideo?.play().catch(() => {});
+}
+
+function closeVideoModal() {
+  if (!videoModal) return;
+  videoModal.classList.remove("is-open");
+  videoModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+  if (modalVideo) {
+    modalVideo.pause();
+    modalVideo.currentTime = 0;
+    modalVideo.removeAttribute("src");
+    modalVideo.load();
+  }
+  lastVideoTrigger?.focus();
+}
+
+videoButtons.forEach((button) => {
+  button.addEventListener("click", () => openVideoModal(button));
+});
+videoCloseButtons.forEach((button) => button.addEventListener("click", closeVideoModal));
+
+const paymentModal = document.querySelector("[data-payment-modal]");
+const paymentDialog = paymentModal?.querySelector("[data-payment-dialog]");
+const paymentForm = paymentModal?.querySelector("[data-payment-form]");
+const paymentOpenButtons = document.querySelectorAll("[data-payment-open]");
+const paymentCloseButtons = paymentModal?.querySelectorAll("[data-payment-close]") || [];
+const paymentPlanInput = paymentForm?.querySelector("[data-payment-plan]");
+const paymentPlanName = paymentModal?.querySelector("[data-payment-plan-name]");
+const paymentTotal = paymentForm?.querySelector("[data-payment-total]");
+const paymentEmail = paymentForm?.querySelector('input[name="email"]');
+const paymentPhone = paymentForm?.querySelector('input[name="phone"]');
+const paymentConsent = paymentForm?.querySelector('input[name="legalConsent"]');
+const paymentSubmit = paymentForm?.querySelector("[data-payment-submit]");
+const paymentLabel = paymentForm?.querySelector("[data-payment-label]");
+const paymentStatus = paymentForm?.querySelector("[data-payment-status]");
+let lastPaymentTrigger = null;
+
+const paymentPlans = {
+  economy: { name: "Эконом", price: 3000 },
+  standard: { name: "Стандарт", price: 5000 },
+  premium: { name: "Премиум", price: 15000 }
+};
+const rubles = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
+
+function setPaymentStatus(message, state = "") {
+  if (!paymentStatus) return;
+  paymentStatus.textContent = message;
+  paymentStatus.dataset.state = state;
+}
+
+function setPaymentPlan(planKey) {
+  const selected = paymentPlans[planKey] || paymentPlans.economy;
+  const safePlanKey = paymentPlans[planKey] ? planKey : "economy";
+  if (paymentPlanInput) paymentPlanInput.value = safePlanKey;
+  if (paymentPlanName) paymentPlanName.textContent = selected.name;
+  if (paymentTotal) paymentTotal.textContent = `${rubles.format(selected.price)} ₽`;
+  if (paymentLabel) paymentLabel.textContent = `Перейти к оплате · ${rubles.format(selected.price)} ₽`;
+  setPaymentStatus();
+}
+
+function closePaymentModal() {
+  if (!paymentModal) return;
+  paymentModal.classList.remove("is-open");
+  paymentModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("payment-modal-open");
+  lastPaymentTrigger?.focus();
+}
+
+function openPaymentModal(trigger) {
+  if (!paymentModal) return;
+  lastPaymentTrigger = trigger;
+  setPaymentPlan(trigger.dataset.plan || "economy");
+  paymentModal.classList.add("is-open");
+  paymentModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("payment-modal-open");
+  window.setTimeout(() => paymentEmail?.focus(), prefersReducedMotion ? 0 : 180);
+}
+
+paymentOpenButtons.forEach((button) => {
+  button.addEventListener("click", () => openPaymentModal(button));
+});
+paymentCloseButtons.forEach((button) => button.addEventListener("click", closePaymentModal));
+
+paymentDialog?.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closePaymentModal();
+    return;
+  }
+  if (event.key !== "Tab") return;
+
+  const focusable = [...paymentDialog.querySelectorAll("button, input, a")].filter(
+    (item) => !item.hasAttribute("disabled") && item.getAttribute("tabindex") !== "-1" && item.type !== "hidden"
+  );
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
+
+paymentForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const email = String(paymentEmail?.value || "").trim();
+  const phone = String(paymentPhone?.value || "").trim();
+  const phoneDigits = phone.replace(/\D/g, "");
+
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    setPaymentStatus("Укажите корректную почту для получения чека.", "error");
+    paymentEmail?.focus();
+    return;
+  }
+  if (phoneDigits.length < 10 || phoneDigits.length > 15) {
+    setPaymentStatus("Укажите телефон с кодом страны.", "error");
+    paymentPhone?.focus();
+    return;
+  }
+  if (!paymentConsent?.checked) {
+    setPaymentStatus("Подтвердите согласие с условиями оплаты и обработки данных.", "error");
+    paymentConsent?.focus();
+    return;
+  }
+  if (!paymentApiBase) {
+    setPaymentStatus("Платежный сервис еще не подключен. Напишите нам в Telegram.", "error");
+    return;
+  }
+
+  const selected = paymentPlans[paymentPlanInput?.value] || paymentPlans.economy;
+  if (paymentSubmit) paymentSubmit.disabled = true;
+  if (paymentLabel) paymentLabel.textContent = "Создаем платеж...";
+  setPaymentStatus("Соединяемся с защищенной платежной системой Т-Банка.", "loading");
+
+  try {
+    const response = await fetch(`${paymentApiBase}/api/payment/init`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        plan: paymentPlanInput?.value || "economy",
+        email,
+        phone
+      })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.paymentUrl) {
+      throw new Error(result.error || "Не удалось создать платеж.");
     }
-  });
-})();
+
+    localStorage.setItem("victoryRealtyPaymentId", result.paymentId || "");
+    localStorage.setItem("victoryRealtyOrderId", result.orderId || "");
+    setPaymentStatus("Платеж создан. Открываем защищенную страницу банка.", "success");
+    window.location.assign(result.paymentUrl);
+  } catch (error) {
+    if (paymentSubmit) paymentSubmit.disabled = false;
+    if (paymentLabel) paymentLabel.textContent = `Повторить · ${rubles.format(selected.price)} ₽`;
+    setPaymentStatus(error.message || "Не удалось создать платеж. Попробуйте еще раз.", "error");
+  }
+});
+
+const paymentResult = new URLSearchParams(window.location.search).get("payment");
+if (paymentResult === "success") {
+  showToast("Оплата прошла. Чек придет на указанную почту.");
+} else if (paymentResult === "failed") {
+  showToast("Оплата не завершена. Можно повторить или выбрать другой способ.");
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+  if (paymentModal?.classList.contains("is-open")) {
+    closePaymentModal();
+  } else if (videoModal?.classList.contains("is-open")) {
+    closeVideoModal();
+  }
+});
