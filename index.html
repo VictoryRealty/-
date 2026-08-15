@@ -7,7 +7,7 @@
     <title>Денисова и партнеры | Обучение брокеров недвижимости</title>
     <meta name="payment-api" content="https://victory-payment.155-212-143-159.sslip.io">
     <script src="https://forma.tbank.ru/static/onlineScript.js"></script>
-    <link rel="stylesheet" href="styles.css?v=20260815-mobile-restore-v3">
+    <link rel="stylesheet" href="styles.css?v=20260815-mobile-studio-v2">
   </head>
   <body>
     <a class="skip-link" href="#main">Перейти к содержанию</a>
@@ -47,6 +47,10 @@
       </symbol>
       <symbol id="icon-phone" viewBox="0 0 24 24">
         <path d="M7.2 4.5 9 8.6 6.9 10c1.1 2.4 2.8 4.1 5.1 5.1L13.5 13l4.1 1.8c.7.3 1.1 1 1 1.8l-.5 2.5c-.2.8-.9 1.4-1.8 1.4C9.3 20.2 3.8 14.7 3.5 7.7c0-.9.6-1.6 1.4-1.8l2.5-.5c.8-.1 1.5.3 1.8 1Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="icon-card" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/>
+        <path d="M3 9h18M7 15h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
       </symbol>
     </svg>
 
@@ -722,6 +726,17 @@
       </div>
     </footer>
 
+    <nav class="mobile-action-dock" data-mobile-dock aria-label="Быстрые действия" aria-hidden="true">
+      <a href="#application">
+        <svg aria-hidden="true"><use href="#icon-send"></use></svg>
+        <span>Заявка</span>
+      </a>
+      <a class="mobile-action-dock__primary" href="#pricing">
+        <svg aria-hidden="true"><use href="#icon-card"></use></svg>
+        <span>Оплата</span>
+      </a>
+    </nav>
+
     <div class="toast" data-toast role="status" aria-live="polite">Заявка подготовлена.</div>
     <div class="video-modal" data-video-modal aria-hidden="true">
       <div class="video-modal__backdrop" data-video-close></div>
@@ -822,6 +837,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260815-payment-installment-mobile-v2"></script>
+    <script src="script.js?v=20260815-payment-installment-mobile-v3"></script>
   </body>
 </html>
