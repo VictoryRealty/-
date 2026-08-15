@@ -7,7 +7,7 @@
     <title>Денисова и партнеры | Обучение брокеров недвижимости</title>
     <meta name="payment-api" content="https://victory-payment.155-212-143-159.sslip.io">
     <script src="https://forma.tbank.ru/static/onlineScript.js"></script>
-    <link rel="stylesheet" href="styles.css?v=20260815-mobile-studio-v2">
+    <link rel="stylesheet" href="styles.css?v=20260816-mobile-layout-v1">
   </head>
   <body>
     <a class="skip-link" href="#main">Перейти к содержанию</a>
@@ -536,8 +536,14 @@
             </button>
           </div>
 
+          <div class="mobile-tariff-tabs" data-tariff-tabs role="tablist" aria-label="Выбор тарифа">
+            <button type="button" role="tab" aria-selected="false" aria-controls="tariff-economy" data-tariff-tab="economy">Эконом</button>
+            <button type="button" role="tab" aria-selected="true" aria-controls="tariff-standard" data-tariff-tab="standard">Стандарт</button>
+            <button type="button" role="tab" aria-selected="false" aria-controls="tariff-premium" data-tariff-tab="premium">Премиум</button>
+          </div>
+
           <div class="tariff-grid reveal">
-            <article class="tariff-card">
+            <article class="tariff-card" id="tariff-economy" data-tariff-card="economy">
               <span class="mini-label">Эконом</span>
               <strong class="tariff-price">3 000 ₽</strong>
               <ul class="pricing-list">
@@ -555,7 +561,7 @@
               </div>
             </article>
 
-            <article class="tariff-card tariff-card--featured">
+            <article class="tariff-card tariff-card--featured is-mobile-active" id="tariff-standard" data-tariff-card="standard">
               <span class="mini-label">Стандарт</span>
               <strong class="tariff-price">5 000 ₽</strong>
               <ul class="pricing-list">
@@ -576,7 +582,7 @@
               </div>
             </article>
 
-            <article class="tariff-card">
+            <article class="tariff-card" id="tariff-premium" data-tariff-card="premium">
               <span class="mini-label">Премиум</span>
               <strong class="tariff-price">15 000 ₽</strong>
               <ul class="pricing-list">
@@ -837,6 +843,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260815-payment-installment-mobile-v3"></script>
+    <script src="script.js?v=20260816-mobile-layout-v1"></script>
   </body>
 </html>

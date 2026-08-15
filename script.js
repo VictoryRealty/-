@@ -18,6 +18,9 @@ const mobileDock = document.querySelector("[data-mobile-dock]");
 const mobileDockLinks = mobileDock?.querySelectorAll("a") || [];
 const applicationSection = document.querySelector("#application");
 const mobileViewport = window.matchMedia("(max-width: 680px)");
+const tariffTabs = document.querySelector("[data-tariff-tabs]");
+const tariffTabButtons = tariffTabs?.querySelectorAll("[data-tariff-tab]") || [];
+const tariffCards = document.querySelectorAll("[data-tariff-card]");
 let lastVideoTrigger = null;
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -49,6 +52,51 @@ function setMobileDockState() {
     }
   });
 }
+
+function setActiveMobileTariff(planKey, moveFocus = false) {
+  const safePlanKey = ["economy", "standard", "premium"].includes(planKey) ? planKey : "standard";
+  const isMobile = mobileViewport.matches;
+
+  tariffTabButtons.forEach((button) => {
+    const isActive = button.dataset.tariffTab === safePlanKey;
+    button.setAttribute("aria-selected", String(isActive));
+    button.tabIndex = isActive ? 0 : -1;
+    if (isActive && moveFocus) button.focus();
+  });
+
+  tariffCards.forEach((card) => {
+    const isActive = card.dataset.tariffCard === safePlanKey;
+    card.classList.toggle("is-mobile-active", isActive);
+    if (isMobile) {
+      card.setAttribute("aria-hidden", String(!isActive));
+    } else {
+      card.removeAttribute("aria-hidden");
+    }
+  });
+}
+
+tariffTabButtons.forEach((button) => {
+  button.addEventListener("click", () => setActiveMobileTariff(button.dataset.tariffTab || "standard"));
+  button.addEventListener("keydown", (event) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const tabs = [...tariffTabButtons];
+    const currentIndex = tabs.indexOf(button);
+    let nextIndex = currentIndex;
+    if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabs.length;
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = tabs.length - 1;
+    setActiveMobileTariff(tabs[nextIndex].dataset.tariffTab || "standard", true);
+  });
+});
+
+setActiveMobileTariff("standard");
+mobileViewport.addEventListener?.("change", () => {
+  const activeTab = [...tariffTabButtons].find((button) => button.getAttribute("aria-selected") === "true");
+  setActiveMobileTariff(activeTab?.dataset.tariffTab || "standard");
+  setMobileDockState();
+});
 
 function setHeaderState() {
   header?.classList.toggle("is-scrolled", window.scrollY > 12);
