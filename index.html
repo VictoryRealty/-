@@ -6,7 +6,8 @@
     <meta name="description" content="Обучение профессии брокера недвижимости в агентстве «Денисова и партнеры»: практика, наставник, профильный юрист, CRM и последующее сотрудничество.">
     <title>Денисова и партнеры | Обучение брокеров недвижимости</title>
     <meta name="payment-api" content="https://victory-payment.155-212-143-159.sslip.io">
-    <link rel="stylesheet" href="styles.css?v=20260815-payment">
+    <script src="https://forma.tbank.ru/static/onlineScript.js"></script>
+    <link rel="stylesheet" href="styles.css?v=20260815-payment-installment-mobile">
   </head>
   <body>
     <a class="skip-link" href="#main">Перейти к содержанию</a>
@@ -532,10 +533,12 @@
                 <li><svg aria-hidden="true"><use href="#icon-check"></use></svg> переговорная комната в Москва-Сити</li>
                 <li><svg aria-hidden="true"><use href="#icon-check"></use></svg> брокер-туры и обучение по жилым комплексам</li>
               </ul>
-              <button class="button button--primary tariff-buy-button" type="button" data-payment-open data-plan="economy" aria-haspopup="dialog" aria-controls="payment-dialog">
-                Оплатить тариф
-                <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
-              </button>
+              <div class="tariff-actions">
+                <button class="button button--primary tariff-buy-button" type="button" data-payment-open data-plan="economy" aria-haspopup="dialog" aria-controls="payment-dialog">
+                  Оплатить сразу
+                  <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
+                </button>
+              </div>
             </article>
 
             <article class="tariff-card tariff-card--featured">
@@ -548,10 +551,15 @@
                 <li><svg aria-hidden="true"><use href="#icon-check"></use></svg> мини-обучение наставника по инструментам</li>
                 <li><svg aria-hidden="true"><use href="#icon-check"></use></svg> официальный доход без потолка</li>
               </ul>
-              <button class="button button--primary tariff-buy-button" type="button" data-payment-open data-plan="standard" aria-haspopup="dialog" aria-controls="payment-dialog">
-                Оплатить тариф
-                <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
-              </button>
+              <div class="tariff-actions">
+                <button class="button button--primary tariff-buy-button" type="button" data-payment-open data-plan="standard" aria-haspopup="dialog" aria-controls="payment-dialog">
+                  Оплатить сразу
+                  <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
+                </button>
+                <button class="button button--secondary tariff-installment-button" type="button" data-installment-open data-plan="standard" aria-haspopup="dialog" aria-controls="installment-dialog">
+                  Рассрочка 3 / 6 / 12 мес.
+                </button>
+              </div>
             </article>
 
             <article class="tariff-card">
@@ -564,10 +572,15 @@
                 <li><svg aria-hidden="true"><use href="#icon-check"></use></svg> помощь с инструментами и переговорами</li>
                 <li><svg aria-hidden="true"><use href="#icon-check"></use></svg> разбор личной стратегии поиска клиентов</li>
               </ul>
-              <button class="button button--primary tariff-buy-button" type="button" data-payment-open data-plan="premium" aria-haspopup="dialog" aria-controls="payment-dialog">
-                Оплатить тариф
-                <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
-              </button>
+              <div class="tariff-actions">
+                <button class="button button--primary tariff-buy-button" type="button" data-payment-open data-plan="premium" aria-haspopup="dialog" aria-controls="payment-dialog">
+                  Оплатить сразу
+                  <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
+                </button>
+                <button class="button button--secondary tariff-installment-button" type="button" data-installment-open data-plan="premium" aria-haspopup="dialog" aria-controls="installment-dialog">
+                  Рассрочка 3 / 6 / 12 мес.
+                </button>
+              </div>
             </article>
           </div>
 
@@ -754,6 +767,51 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260815-payment"></script>
+    <div class="payment-modal installment-modal" data-installment-modal aria-hidden="true">
+      <div class="payment-modal__backdrop" data-installment-close></div>
+      <div class="payment-modal__dialog" id="installment-dialog" role="dialog" aria-modal="true" aria-labelledby="installment-title" data-installment-dialog>
+        <div class="payment-modal__head">
+          <div>
+            <p class="payment-modal__eyebrow">Рассрочка от Т-Банка</p>
+            <h2 id="installment-title">Тариф «<span data-installment-plan-name>Стандарт</span>»</h2>
+          </div>
+          <button class="payment-modal__close" type="button" data-installment-close aria-label="Закрыть форму рассрочки">×</button>
+        </div>
+
+        <div class="installment-form">
+          <div class="payment-form__total" aria-live="polite">
+            <span>Стоимость обучения</span>
+            <strong data-installment-total>5 000 ₽</strong>
+          </div>
+
+          <fieldset class="installment-terms">
+            <legend>Выберите срок</legend>
+            <label>
+              <input type="radio" name="installmentTerm" value="installment_0_0_3_5" data-months="3" checked>
+              <span>3 мес.</span>
+            </label>
+            <label>
+              <input type="radio" name="installmentTerm" value="installment_0_0_6_8,6" data-months="6">
+              <span>6 мес.</span>
+            </label>
+            <label>
+              <input type="radio" name="installmentTerm" value="installment_0_0_12_15,2" data-months="12">
+              <span>12 мес.</span>
+            </label>
+          </fieldset>
+
+          <div class="installment-preview" aria-live="polite">
+            <span>Ориентировочный платеж</span>
+            <strong>≈ <span data-installment-monthly>1 667</span> ₽ <small>/ месяц</small></strong>
+          </div>
+
+          <div class="tbank-button-host" data-tbank-button-host></div>
+          <p class="installment-fallback" data-tbank-fallback hidden>Кнопка банка не загрузилась. Обновите страницу или <a href="https://t.me/IvanMakeBusiness" target="_blank" rel="noopener">напишите в Telegram</a>.</p>
+          <p class="payment-form__note">Анкета откроется на защищенной странице Т-Банка. Расчет предварительный; решение и итоговые условия определяет банк.</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js?v=20260815-payment-installment-mobile-v2"></script>
   </body>
 </html>

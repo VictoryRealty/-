@@ -65,6 +65,73 @@ if ("IntersectionObserver" in window && !prefersReducedMotion) {
   revealItems.forEach((item) => item.classList.add("is-visible"));
 }
 
+document.querySelectorAll(".faq-list details").forEach((details) => {
+  const summary = details.querySelector("summary");
+  if (!summary || prefersReducedMotion) return;
+
+  let animation = null;
+  let isClosing = false;
+  let isExpanding = false;
+
+  const finishAnimation = (isOpen) => {
+    details.open = isOpen;
+    animation = null;
+    isClosing = false;
+    isExpanding = false;
+    details.style.height = "";
+    details.style.overflow = "";
+  };
+
+  const expand = () => {
+    const startHeight = `${details.offsetHeight}px`;
+    const endHeight = `${details.scrollHeight}px`;
+
+    animation?.cancel();
+    isExpanding = true;
+    animation = details.animate(
+      { height: [startHeight, endHeight] },
+      { duration: 320, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }
+    );
+    animation.onfinish = () => finishAnimation(true);
+    animation.oncancel = () => {
+      isExpanding = false;
+    };
+  };
+
+  const open = () => {
+    details.style.height = `${details.offsetHeight}px`;
+    details.open = true;
+    window.requestAnimationFrame(expand);
+  };
+
+  const close = () => {
+    const startHeight = `${details.offsetHeight}px`;
+    const endHeight = `${summary.offsetHeight}px`;
+
+    animation?.cancel();
+    isClosing = true;
+    animation = details.animate(
+      { height: [startHeight, endHeight] },
+      { duration: 260, easing: "cubic-bezier(0.4, 0, 0.2, 1)" }
+    );
+    animation.onfinish = () => finishAnimation(false);
+    animation.oncancel = () => {
+      isClosing = false;
+    };
+  };
+
+  summary.addEventListener("click", (event) => {
+    event.preventDefault();
+    details.style.overflow = "hidden";
+
+    if (isClosing || !details.open) {
+      open();
+    } else if (isExpanding || details.open) {
+      close();
+    }
+  });
+});
+
 function showToast(message) {
   if (!toast) return;
   toast.textContent = message;
@@ -326,6 +393,121 @@ paymentForm?.addEventListener("submit", async (event) => {
   }
 });
 
+const installmentModal = document.querySelector("[data-installment-modal]");
+const installmentDialog = installmentModal?.querySelector("[data-installment-dialog]");
+const installmentOpenButtons = document.querySelectorAll("[data-installment-open]");
+const installmentCloseButtons = installmentModal?.querySelectorAll("[data-installment-close]") || [];
+const installmentPlanName = installmentModal?.querySelector("[data-installment-plan-name]");
+const installmentTotal = installmentModal?.querySelector("[data-installment-total]");
+const installmentMonthly = installmentModal?.querySelector("[data-installment-monthly]");
+const installmentTermInputs = installmentModal?.querySelectorAll('input[name="installmentTerm"]') || [];
+const tbankButtonHost = installmentModal?.querySelector("[data-tbank-button-host]");
+const installmentFallback = installmentModal?.querySelector("[data-tbank-fallback]");
+const installmentShopId = "71b6f5de-46e6-4695-b4cd-bdeada85e12a";
+const installmentShowcaseId = "775b4264-5a84-4296-9493-ec699aa1999e";
+let activeInstallmentPlan = "standard";
+let lastInstallmentTrigger = null;
+let installmentFallbackTimer = null;
+
+function getSelectedInstallmentTerm() {
+  return [...installmentTermInputs].find((input) => input.checked) || installmentTermInputs[0];
+}
+
+function renderInstallmentButton() {
+  if (!tbankButtonHost) return;
+
+  const selectedPlan = paymentPlans[activeInstallmentPlan] || paymentPlans.standard;
+  const selectedTerm = getSelectedInstallmentTerm();
+  const months = Number(selectedTerm?.dataset.months || 3);
+  const promoCode = selectedTerm?.value || "installment_0_0_3_5";
+  const monthly = Math.ceil(selectedPlan.price / months);
+  const productName = `Обучение профессии брокера — тариф ${selectedPlan.name}`;
+  const productData = new URLSearchParams({
+    "items.0.name": productName,
+    "items.0.price": String(selectedPlan.price),
+    "items.0.quantity": "1",
+    sum: String(selectedPlan.price)
+  });
+
+  if (installmentMonthly) installmentMonthly.textContent = rubles.format(monthly);
+  if (installmentFallback) installmentFallback.hidden = true;
+
+  const bankButton = document.createElement("tinkoff-create-button");
+  bankButton.setAttribute("size", "M");
+  bankButton.setAttribute("subtext", `≈ ${rubles.format(monthly)} ₽ в месяц`);
+  bankButton.setAttribute("shopId", installmentShopId);
+  bankButton.setAttribute("showcaseId", installmentShowcaseId);
+  bankButton.setAttribute("ui-data", "view=newTab");
+  bankButton.setAttribute("payment-data", `${productData.toString()}&promoCode=${promoCode}`);
+  tbankButtonHost.replaceChildren(bankButton);
+
+  window.clearTimeout(installmentFallbackTimer);
+  installmentFallbackTimer = window.setTimeout(() => {
+    if (!window.customElements?.get("tinkoff-create-button") && installmentFallback) {
+      installmentFallback.hidden = false;
+    }
+  }, 6000);
+}
+
+function setInstallmentPlan(planKey) {
+  activeInstallmentPlan = planKey === "premium" ? "premium" : "standard";
+  const selectedPlan = paymentPlans[activeInstallmentPlan];
+  if (installmentPlanName) installmentPlanName.textContent = selectedPlan.name;
+  if (installmentTotal) installmentTotal.textContent = `${rubles.format(selectedPlan.price)} ₽`;
+  renderInstallmentButton();
+}
+
+function closeInstallmentModal() {
+  if (!installmentModal) return;
+  installmentModal.classList.remove("is-open");
+  installmentModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("payment-modal-open");
+  lastInstallmentTrigger?.focus();
+}
+
+function openInstallmentModal(trigger) {
+  if (!installmentModal) return;
+  lastInstallmentTrigger = trigger;
+  setInstallmentPlan(trigger.dataset.plan || "standard");
+  installmentModal.classList.add("is-open");
+  installmentModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("payment-modal-open");
+  window.setTimeout(() => getSelectedInstallmentTerm()?.focus(), prefersReducedMotion ? 0 : 180);
+}
+
+installmentOpenButtons.forEach((button) => {
+  button.addEventListener("click", () => openInstallmentModal(button));
+});
+installmentCloseButtons.forEach((button) => button.addEventListener("click", closeInstallmentModal));
+installmentTermInputs.forEach((input) => input.addEventListener("change", renderInstallmentButton));
+
+installmentDialog?.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeInstallmentModal();
+    return;
+  }
+  if (event.key !== "Tab") return;
+
+  const focusable = [...installmentDialog.querySelectorAll("button, input, a, tinkoff-create-button")].filter(
+    (item) => !item.hasAttribute("disabled") && item.getAttribute("tabindex") !== "-1" && item.type !== "hidden"
+  );
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
+
+window.customElements?.whenDefined("tinkoff-create-button").then(() => {
+  if (installmentFallback) installmentFallback.hidden = true;
+});
+
 const paymentResult = new URLSearchParams(window.location.search).get("payment");
 if (paymentResult === "success") {
   showToast("Оплата прошла. Чек придет на указанную почту.");
@@ -335,7 +517,9 @@ if (paymentResult === "success") {
 
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
-  if (paymentModal?.classList.contains("is-open")) {
+  if (installmentModal?.classList.contains("is-open")) {
+    closeInstallmentModal();
+  } else if (paymentModal?.classList.contains("is-open")) {
     closePaymentModal();
   } else if (videoModal?.classList.contains("is-open")) {
     closeVideoModal();

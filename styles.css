@@ -1853,6 +1853,127 @@ button {
   transform: none;
 }
 
+.installment-form {
+  padding: 22px 26px 26px;
+}
+
+.installment-terms {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.installment-terms legend {
+  margin-bottom: 9px;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 720;
+}
+
+.installment-terms {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.installment-terms legend {
+  grid-column: 1 / -1;
+}
+
+.installment-terms label {
+  position: relative;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.installment-terms input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.installment-terms label span {
+  min-height: 50px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  font-weight: 720;
+  transition: border-color 180ms var(--ease), background 180ms var(--ease), color 180ms var(--ease), box-shadow 180ms var(--ease);
+}
+
+.installment-terms input:checked + span {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+.installment-terms input:focus-visible + span {
+  outline: 3px solid rgba(196,154,74,0.65);
+  outline-offset: 3px;
+}
+
+.installment-preview {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid rgba(196,154,74,0.34);
+  border-radius: var(--radius);
+  background: rgba(243,228,189,0.28);
+}
+
+.installment-preview > span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 720;
+  text-transform: uppercase;
+}
+
+.installment-preview strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.65rem;
+  line-height: 1.1;
+}
+
+.installment-preview small {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.tbank-button-host {
+  min-height: 56px;
+}
+
+.tbank-button-host tinkoff-create-button {
+  display: block;
+  width: 100%;
+}
+
+.installment-fallback {
+  margin: 10px 0 0;
+  color: #a62e22;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.installment-fallback[hidden] {
+  display: none;
+}
+
+.installment-fallback a {
+  color: var(--ink);
+  font-weight: 720;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .workflow-grid {
   grid-template-columns: repeat(6, 1fr);
 }
@@ -2036,9 +2157,20 @@ button {
   letter-spacing: 0;
 }
 
-.tariff-buy-button {
-  width: 100%;
+.tariff-actions {
+  display: grid;
+  gap: 10px;
   margin-top: auto;
+}
+
+.tariff-actions .button {
+  width: 100%;
+  min-height: 52px;
+  padding-inline: 14px;
+}
+
+.tariff-installment-button {
+  background: rgba(255,255,255,0.74);
 }
 
 .tariff-note {
@@ -2135,14 +2267,17 @@ button {
 
   .main-nav {
     position: absolute;
-    top: 76px;
+    top: calc(100% + 8px);
     right: 20px;
     left: 20px;
+    z-index: 2;
     display: none;
     flex-direction: column;
     align-items: stretch;
+    justify-self: stretch;
     padding: 10px;
-    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(9,9,9,0.1);
+    background: rgba(255,255,255,0.98);
     box-shadow: var(--shadow-md);
   }
 
@@ -2238,13 +2373,37 @@ button {
 }
 
 @media (max-width: 760px) {
+  .header-shell {
+    gap: 12px;
+  }
+
+  .brand,
+  .brand-copy {
+    min-width: 0;
+  }
+
+  .brand-copy small {
+    max-width: 230px;
+    white-space: normal;
+    line-height: 1.1;
+  }
+
   .container {
     width: min(100% - 28px, var(--max));
   }
 
   .section,
   .section-band {
-    padding: 76px 0;
+    padding: 64px 0;
+  }
+
+  .section-heading {
+    margin-bottom: 36px;
+  }
+
+  .section-heading p:not(.eyebrow),
+  .final-copy p {
+    font-size: 1rem;
   }
 
   .header-actions .button {
@@ -2269,6 +2428,16 @@ button {
     width: 100%;
   }
 
+  .section-cta,
+  .section-cta__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .section-cta__actions {
+    width: 100%;
+  }
+
   .trust-strip {
     display: grid;
   }
@@ -2286,7 +2455,7 @@ button {
     width: 100%;
     height: auto;
     min-height: 0;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 3;
     justify-self: stretch;
   }
 
@@ -2317,9 +2486,14 @@ button {
     margin-top: 24px;
   }
 
-  .hero .hero-actions .button--secondary,
   .hero .trust-strip {
     display: none;
+  }
+
+  .reveal {
+    transform: translateY(14px);
+    transition-duration: 420ms;
+    transition-delay: 0ms !important;
   }
 
   .founder-intro__grid,
@@ -2462,6 +2636,10 @@ button {
     padding: 18px 16px calc(24px + env(safe-area-inset-bottom));
   }
 
+  .installment-form {
+    padding: 18px 16px calc(24px + env(safe-area-inset-bottom));
+  }
+
   .payment-form__total {
     margin-bottom: 16px;
   }
@@ -2518,6 +2696,20 @@ button {
   .role-card,
   .testimonial {
     padding: 20px;
+  }
+
+  .stack-detail {
+    padding: 0;
+  }
+
+  .stack-detail summary {
+    min-height: 122px;
+    gap: 12px;
+    padding: 20px;
+  }
+
+  .stack-detail > p {
+    padding: 0 20px 20px;
   }
 
   .price-top strong {
