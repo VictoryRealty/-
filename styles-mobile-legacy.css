@@ -1,7 +1,11 @@
 /*
-  Mobile composition restored from the July 2026 version.
+  Mobile studio pass: editorial authority with a clear path to action.
   Desktop and tablet styling remain in styles-base.css.
 */
+.mobile-action-dock {
+  display: none;
+}
+
 @media (max-width: 680px) {
   html {
     scroll-behavior: auto;
@@ -13,39 +17,41 @@
   }
 
   .container {
-    width: min(calc(100% - 32px), var(--max));
+    width: min(calc(100% - 28px), var(--max));
   }
 
   .section,
   .section-band {
-    scroll-margin-top: 64px;
-    padding: 56px 0;
+    scroll-margin-top: 8px;
+    padding: 48px 0;
   }
 
   .section-heading {
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
 
   .section-heading h2,
   .founder-intro__copy h2,
   .trust-copy h2,
   .final-copy h2 {
-    font-size: clamp(2rem, 8.4vw, 2.3rem);
-    line-height: 1.04;
+    max-width: 18ch;
+    font-size: clamp(1.78rem, 7.3vw, 2.05rem);
+    line-height: 1.06;
+    text-wrap: balance;
   }
 
   .section-heading p:not(.eyebrow),
   .founder-intro__copy > p:not(.eyebrow),
   .trust-copy > p,
   .final-copy p {
-    margin-top: 18px;
+    margin-top: 14px;
     font-size: 0.95rem;
-    line-height: 1.58;
+    line-height: 1.55;
   }
 
   .eyebrow {
     gap: 9px;
-    margin-bottom: 15px;
+    margin-bottom: 13px;
     font-size: 0.68rem;
   }
 
@@ -175,7 +181,7 @@
   .hero,
   .hero.section-band {
     position: relative;
-    min-height: clamp(720px, 100svh, 820px);
+    min-height: max(780px, 100svh);
     padding: 0;
     overflow: hidden;
     background: var(--black);
@@ -185,8 +191,8 @@
   .hero.section-band::before {
     z-index: 1;
     background:
-      linear-gradient(180deg, rgba(4, 10, 8, 0.48) 0%, rgba(4, 10, 8, 0.3) 30%, rgba(4, 10, 8, 0.76) 72%, rgba(4, 10, 8, 0.92) 100%),
-      linear-gradient(90deg, rgba(4, 10, 8, 0.58), transparent 78%);
+      linear-gradient(180deg, rgba(4, 10, 8, 0.34) 0%, rgba(4, 10, 8, 0.2) 26%, rgba(4, 10, 8, 0.76) 62%, rgba(4, 10, 8, 0.96) 100%),
+      linear-gradient(90deg, rgba(4, 10, 8, 0.78) 0%, rgba(4, 10, 8, 0.42) 54%, transparent 92%);
     mask-image: none;
   }
 
@@ -196,8 +202,8 @@
     min-height: inherit;
     display: flex;
     align-items: flex-end;
-    padding-top: 116px;
-    padding-bottom: 146px;
+    padding-top: 112px;
+    padding-bottom: 122px;
   }
 
   .hero-copy {
@@ -212,12 +218,12 @@
   }
 
   .hero-copy h1 {
-    max-width: 100%;
+    max-width: 9.2em;
     color: var(--white);
     font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(2.28rem, 10.4vw, 2.72rem);
+    font-size: clamp(2.15rem, 9.5vw, 2.55rem);
     font-weight: 400;
-    line-height: 1.01;
+    line-height: 1.02;
     text-wrap: balance;
   }
 
@@ -226,22 +232,22 @@
   }
 
   .hero .hero-lead {
-    max-width: 560px;
-    margin-top: 18px;
+    max-width: 35rem;
+    margin-top: 16px;
     color: rgba(255, 255, 255, 0.86);
-    font-size: 1rem;
-    line-height: 1.52;
+    font-size: 0.94rem;
+    line-height: 1.5;
   }
 
   .hero .hero-actions {
     display: grid;
     gap: 8px;
-    margin-top: 22px;
+    margin-top: 20px;
   }
 
   .hero .button {
     width: 100%;
-    min-height: 50px;
+    min-height: 52px;
   }
 
   .hero .button--primary {
@@ -282,73 +288,64 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 58% 18%;
+    object-position: 74% 18%;
   }
 
   .hero-portrait figcaption {
     display: none;
   }
 
-  /* Reuse the trust points as the compact swipe strip from the old hero. */
+  /* All three entry conditions stay visible without a hidden swipe. */
   .hero .trust-strip {
     position: absolute;
     z-index: 4;
     right: calc(50% - 50vw);
     bottom: 0;
     left: calc(50% - 50vw);
-    display: flex;
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0;
     margin: 0;
-    padding: 0 16px;
-    overflow-x: auto;
+    padding: 0;
+    overflow: hidden;
     border-top: 1px solid var(--line);
     background: rgba(255, 255, 255, 0.98);
-    scroll-padding-inline: 16px;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    overscroll-behavior-inline: contain;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .hero .trust-strip::-webkit-scrollbar {
-    display: none;
   }
 
   .hero .trust-strip span {
-    min-height: 118px;
-    flex: 0 0 min(78vw, 304px);
+    min-width: 0;
+    min-height: 104px;
     align-items: flex-start;
     justify-content: center;
     flex-direction: column;
-    gap: 10px;
-    padding: 18px 16px;
+    gap: 8px;
+    padding: 13px 10px;
     border: 0;
-    border-right: 1px solid var(--line);
+    border-left: 1px solid var(--line);
     border-radius: 0;
     background: transparent;
     color: var(--ink-soft);
-    font-size: 0.88rem;
-    line-height: 1.38;
+    font-size: 0.72rem;
+    line-height: 1.3;
     box-shadow: none;
     backdrop-filter: none;
-    scroll-snap-align: start;
+    text-wrap: balance;
   }
 
   .hero .trust-strip span:first-child {
-    border-left: 1px solid var(--line);
+    border-left: 0;
   }
 
   .hero .trust-strip svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     color: var(--gold-strong);
   }
 
   /* Founder: text first, portrait second, compact facts. */
   .founder-intro__grid {
     grid-template-columns: 1fr;
-    gap: 30px;
+    gap: 24px;
   }
 
   .founder-intro__copy {
@@ -356,11 +353,11 @@
   }
 
   .founder-intro__portrait {
-    width: min(100%, 340px);
+    width: 100%;
     height: auto;
     display: block;
     order: 2;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 16 / 10;
     justify-self: center;
     border-radius: var(--radius);
     box-shadow: none;
@@ -368,20 +365,20 @@
 
   .founder-intro__portrait img {
     height: 100%;
-    object-position: center 18%;
+    object-position: center 24%;
   }
 
   .founder-facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-top: 26px;
+    margin-top: 22px;
   }
 
   .founder-facts div,
   .founder-facts div:nth-child(odd),
   .founder-facts div:nth-child(even) {
     min-width: 0;
-    min-height: 112px;
-    padding: 14px 12px;
+    min-height: 100px;
+    padding: 13px 11px;
     border-right: 0;
     border-bottom: 1px solid var(--line);
   }
@@ -404,8 +401,9 @@
   }
 
   .founder-facts dd {
-    margin-top: 8px;
+    margin-top: 7px;
     font-size: 0.8rem;
+    line-height: 1.4;
     overflow-wrap: anywhere;
   }
 
@@ -420,11 +418,11 @@
     display: flex;
     align-items: stretch;
     gap: 12px;
-    margin-inline: -16px;
-    padding: 0 16px 10px;
+    margin-inline: -14px;
+    padding: 0 14px 16px;
     overflow-x: auto;
     overflow-y: visible;
-    scroll-padding-inline: 16px;
+    scroll-padding-inline: 14px;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     overscroll-behavior-inline: contain;
@@ -444,22 +442,22 @@
   .reasons-grid > *,
   .stack-grid > *,
   .client-source-grid > * {
-    min-height: 232px;
-    flex: 0 0 min(82vw, 316px);
+    min-height: 220px;
+    flex: 0 0 min(84vw, 326px);
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }
 
   .practice-grid > *,
   .proof-grid > * {
-    flex: 0 0 min(84vw, 326px);
+    flex: 0 0 min(86vw, 334px);
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }
 
   .tariff-grid > * {
     min-height: 0;
-    flex: 0 0 min(88vw, 338px);
+    flex: 0 0 min(88vw, 342px);
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }
@@ -472,11 +470,14 @@
     justify-self: stretch;
   }
 
-  .benefit-media img {
-    width: auto;
+  .benefit-media img,
+  .benefit-media img:first-child,
+  .benefit-media img:last-child {
+    width: min(86vw, 334px);
     height: auto;
     max-height: 560px;
-    flex: 0 0 min(82vw, 326px);
+    flex: 0 0 min(86vw, 334px);
+    aspect-ratio: 853 / 1280;
     object-fit: contain;
     border: 1px solid var(--line);
     border-radius: var(--radius);
@@ -527,7 +528,7 @@
   .source-card,
   .role-card,
   .compare-card {
-    padding: 20px;
+    padding: 18px;
   }
 
   .feature-card--wide {
@@ -536,11 +537,11 @@
 
   .feature-card h3,
   .glass-card h3 {
-    margin-top: 24px;
+    margin-top: 20px;
   }
 
   .source-card h3 {
-    margin-top: 26px;
+    margin-top: 22px;
   }
 
   .workflow-grid .source-card {
@@ -549,17 +550,17 @@
 
   .role-card,
   .compare-card {
-    padding: 22px 20px;
+    padding: 20px 18px;
   }
 
   .role-card .compare-head strong,
   .compare-card .compare-head strong {
-    font-size: 2.05rem;
+    font-size: 1.85rem;
   }
 
   .compare-list {
     gap: 9px;
-    margin-top: 26px;
+    margin-top: 22px;
   }
 
   .compare-list li {
@@ -571,8 +572,8 @@
 
   .office-strip {
     flex-wrap: nowrap;
-    margin-inline: -16px;
-    padding: 0 16px 8px;
+    margin-inline: -14px;
+    padding: 0 14px 8px;
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -602,8 +603,8 @@
   }
 
   .benefit-card {
-    min-height: 142px;
-    padding: 16px 12px;
+    min-height: 134px;
+    padding: 15px 11px;
     border: 0;
     border-bottom: 1px solid var(--line);
     border-radius: 0;
@@ -625,13 +626,13 @@
   }
 
   .benefit-card strong {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     line-height: 1.3;
   }
 
   .benefit-card span {
     margin-top: 8px;
-    font-size: 0.75rem;
+    font-size: 0.76rem;
     line-height: 1.48;
   }
 
@@ -653,11 +654,14 @@
     width: 100%;
     max-width: none;
     height: auto;
-    aspect-ratio: 4 / 5;
+    max-height: 560px;
+    aspect-ratio: 9 / 16;
+    object-fit: contain;
+    background: var(--black-2);
   }
 
   .proof-heading {
-    margin-top: 56px;
+    margin-top: 44px;
   }
 
   .proof-grid {
@@ -666,36 +670,36 @@
 
   /* Pricing keeps direct actions visible and makes tariff comparison swipeable. */
   .pricing-head {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
 
   .roi-strip {
     grid-template-columns: 1fr;
-    gap: 16px;
-    margin-bottom: 14px;
-    padding: 18px;
+    gap: 14px;
+    margin-bottom: 12px;
+    padding: 17px;
     box-shadow: none;
   }
 
   .roi-strip h3 {
-    font-size: 1.6rem;
+    font-size: 1.45rem;
   }
 
   .roi-strip__example {
-    padding: 17px 0 0;
+    padding: 15px 0 0;
     border-top: 1px solid var(--line);
     border-left: 0;
   }
 
   .roi-strip__example strong {
-    font-size: 1.23rem;
+    font-size: 1.12rem;
     overflow-wrap: anywhere;
   }
 
   .pricing-shortcuts {
     display: grid;
     gap: 8px;
-    margin: 0 0 20px;
+    margin: 0 0 18px;
   }
 
   .pricing-shortcuts .button {
@@ -704,11 +708,11 @@
   }
 
   .tariff-card {
-    padding: 22px 20px;
+    padding: 20px 18px;
   }
 
   .tariff-price {
-    font-size: 2.5rem;
+    font-size: 2.35rem;
   }
 
   .tariff-note {
@@ -717,17 +721,17 @@
 
   .faq-grid {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 20px;
   }
 
   .faq-list {
-    gap: 10px;
+    gap: 8px;
   }
 
   .faq-list summary {
-    min-height: 60px;
-    padding: 15px 48px 15px 16px;
-    font-size: 0.92rem;
+    min-height: 56px;
+    padding: 14px 46px 14px 15px;
+    font-size: 0.9rem;
     line-height: 1.38;
   }
 
@@ -736,19 +740,19 @@
   }
 
   .faq-list p {
-    padding: 0 16px 18px;
+    padding: 0 15px 17px;
     font-size: 0.88rem;
     line-height: 1.58;
   }
 
   .final-grid {
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 24px;
   }
 
   .lead-form {
     width: 100%;
-    padding: 22px 18px 28px;
+    padding: 20px 16px 24px;
     box-shadow: none;
   }
 
@@ -759,6 +763,69 @@
 
   .footer-legal {
     grid-column: auto;
+  }
+
+  .mobile-action-dock {
+    position: fixed;
+    right: 12px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: 12px;
+    z-index: 96;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 6px;
+    padding: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: var(--radius);
+    background: rgba(8, 8, 8, 0.9);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
+    opacity: 0;
+    transform: translateY(calc(100% + 22px));
+    pointer-events: none;
+    backdrop-filter: blur(18px);
+    transition: opacity 220ms var(--ease), transform 260ms var(--ease);
+  }
+
+  .mobile-action-dock.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .mobile-action-dock a {
+    min-width: 0;
+    min-height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.84);
+    font-size: 0.88rem;
+    font-weight: 760;
+  }
+
+  .mobile-action-dock__primary {
+    border-color: var(--wine) !important;
+    background: var(--wine);
+    color: var(--white) !important;
+  }
+
+  .mobile-action-dock svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  body.modal-open .mobile-action-dock,
+  body.payment-modal-open .mobile-action-dock {
+    opacity: 0;
+    transform: translateY(calc(100% + 22px));
+    pointer-events: none;
+  }
+
+  .toast {
+    bottom: calc(78px + env(safe-area-inset-bottom));
   }
 
   /* Avoid delayed/blank cards inside horizontal collections on touch devices. */
@@ -791,17 +858,40 @@
   }
 
   .hero-copy h1 {
-    font-size: 2.25rem;
+    font-size: clamp(2.15rem, 9.5vw, 2.55rem);
   }
 
   .hero .hero-lead {
-    font-size: 0.96rem;
+    font-size: 0.94rem;
   }
 
   .section-heading h2,
   .founder-intro__copy h2,
   .trust-copy h2,
   .final-copy h2 {
-    font-size: 1.98rem;
+    font-size: clamp(1.78rem, 7.3vw, 2.05rem);
+  }
+}
+
+@media (max-width: 350px) {
+  .brand-copy strong {
+    max-width: 168px;
+    overflow: visible;
+    font-size: 0.77rem;
+    text-overflow: clip;
+  }
+
+  .brand-copy small {
+    max-width: 168px;
+    font-size: 0.54rem;
+  }
+
+  .hero-copy h1 {
+    font-size: 2.12rem;
+  }
+
+  .hero .trust-strip span {
+    padding-inline: 8px;
+    font-size: 0.68rem;
   }
 }
