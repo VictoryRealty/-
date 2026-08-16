@@ -510,11 +510,11 @@
   }
 
   .founder-intro__portrait {
-    width: 100%;
+    width: min(100%, 340px);
     height: auto;
     display: block;
     order: 2;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 5;
     justify-self: center;
     border-radius: var(--radius);
     box-shadow: none;
@@ -522,7 +522,7 @@
 
   .founder-intro__portrait img {
     height: 100%;
-    object-position: center 24%;
+    object-position: center top;
   }
 
   .founder-facts {
@@ -1394,17 +1394,6 @@
 
   .payment-modal__head h2 {
     font-size: 1.45rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-portrait {
-    background: var(--black);
-  }
-
-  .hero-portrait img {
-    object-fit: contain;
-    object-position: center top;
   }
 }
 
