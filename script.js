@@ -24,10 +24,23 @@ const tariffCards = document.querySelectorAll("[data-tariff-card]");
 let lastVideoTrigger = null;
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const leadEndpoint = "https://formsubmit.co/ajax/batuninivan3@gmail.com";
 const submitButton = form?.querySelector("button[type='submit']");
 const submitLabel = submitButton?.querySelector("[data-submit-label]");
 const paymentApiBase = String(document.querySelector('meta[name="payment-api"]')?.content || "").replace(/\/$/, "");
+
+function trackFunnel(event, details = {}) {
+  if (!paymentApiBase) return;
+  fetch(`${paymentApiBase}/api/analytics`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ event, ...details }),
+    keepalive: true
+  }).catch(() => {});
+}
+
+document.querySelectorAll('a[href="#application"]').forEach((link) => {
+  link.addEventListener("click", () => trackFunnel("lead_cta_click"));
+});
 
 function setMobileDockState() {
   if (!mobileDock) return;
@@ -331,19 +344,30 @@ function showToast(message) {
   }, 4200);
 }
 
-form?.addEventListener("submit", (event) => {
+form?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const data = new FormData(form);
   const name = String(data.get("name") || "").trim();
   const phone = String(data.get("phone") || "").trim();
   const channel = String(data.get("channel") || "Telegram").trim();
   const experience = String(data.get("experience") || "").trim();
+  const dataConsent = data.get("dataConsent") === "on";
 
   if (!name || !phone) {
     if (formError) formError.textContent = "Заполните имя и телефон, чтобы мы могли связаться с вами.";
     if (formSuccess) formSuccess.textContent = "";
     const firstInvalid = form.querySelector(!name ? "[name='name']" : "[name='phone']");
     firstInvalid?.focus();
+    return;
+  }
+  if (!dataConsent) {
+    if (formError) formError.textContent = "Подтвердите согласие на обработку персональных данных.";
+    if (formSuccess) formSuccess.textContent = "";
+    form.querySelector("[name='dataConsent']")?.focus();
+    return;
+  }
+  if (!paymentApiBase) {
+    if (formError) formError.textContent = "Сервис заявок временно недоступен. Напишите нам в Telegram.";
     return;
   }
 
@@ -358,37 +382,36 @@ form?.addEventListener("submit", (event) => {
     channel,
     experience: experience || "Не указан",
     source: window.location.href,
-    submittedAt: new Date().toLocaleString("ru-RU"),
-    _subject: "Новая бронь на обучение брокеров",
-    _template: "table",
-    _captcha: "false"
+    dataConsent
   };
 
-  fetch(leadEndpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json"
-    },
-    body: JSON.stringify(payload)
-  })
-    .then((response) => {
-      if (!response.ok) throw new Error("Lead request failed");
-      form.reset();
-      if (channelSelect) channelSelect.value = "Telegram";
-      form.classList.add("is-submitted");
-      form.querySelectorAll("input, select, textarea").forEach((field) => {
-        field.disabled = true;
-      });
-      if (submitLabel) submitLabel.textContent = "Спасибо за отклик";
-      if (formSuccess) formSuccess.textContent = "Заявка отправлена. Мы свяжемся с вами в ближайшее время.";
-      showToast("Заявка отправлена.");
-    })
-    .catch(() => {
-      if (submitButton) submitButton.disabled = false;
-      if (submitLabel) submitLabel.textContent = "Оставить заявку";
-      if (formError) formError.textContent = "Не получилось отправить заявку. Попробуйте еще раз или напишите в Telegram.";
+  trackFunnel("lead_submit");
+  try {
+    const response = await fetch(`${paymentApiBase}/api/lead`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(payload)
     });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "Lead request failed");
+
+    form.reset();
+    if (channelSelect) channelSelect.value = "Telegram";
+    form.classList.add("is-submitted");
+    form.querySelectorAll("input, select, textarea").forEach((field) => {
+      field.disabled = true;
+    });
+    if (submitLabel) submitLabel.textContent = "Спасибо за отклик";
+    if (formSuccess) formSuccess.textContent = "Заявка отправлена. Мы свяжемся с вами в ближайшее время.";
+    trackFunnel("lead_success");
+    showToast("Заявка отправлена.");
+  } catch (error) {
+    if (submitButton) submitButton.disabled = false;
+    if (submitLabel) submitLabel.textContent = "Оставить заявку";
+    if (formError) formError.textContent = error.message && error.message !== "Lead request failed"
+      ? error.message
+      : "Не получилось отправить заявку. Попробуйте еще раз или напишите в Telegram.";
+  }
 });
 
 channelButtons.forEach((button) => {
@@ -494,6 +517,7 @@ function openPaymentModal(trigger) {
   paymentModal.classList.add("is-open");
   paymentModal.setAttribute("aria-hidden", "false");
   document.body.classList.add("payment-modal-open");
+  trackFunnel("payment_open", { plan: trigger.dataset.plan || "economy" });
   window.setTimeout(() => paymentEmail?.focus(), prefersReducedMotion ? 0 : 180);
 }
 
@@ -557,6 +581,7 @@ paymentForm?.addEventListener("submit", async (event) => {
   setPaymentStatus("Соединяемся с защищенной платежной системой Т-Банка.", "loading");
 
   try {
+    trackFunnel("payment_init", { plan: paymentPlanInput?.value || "economy" });
     const response = await fetch(`${paymentApiBase}/api/payment/init`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -571,8 +596,10 @@ paymentForm?.addEventListener("submit", async (event) => {
       throw new Error(result.error || "Не удалось создать платеж.");
     }
 
-    localStorage.setItem("victoryRealtyPaymentId", result.paymentId || "");
-    localStorage.setItem("victoryRealtyOrderId", result.orderId || "");
+    if (result.paymentId && result.orderId) {
+      localStorage.setItem("victoryRealtyPaymentId", String(result.paymentId));
+      localStorage.setItem("victoryRealtyOrderId", String(result.orderId));
+    }
     setPaymentStatus("Платеж создан. Открываем защищенную страницу банка.", "success");
     window.location.assign(result.paymentUrl);
   } catch (error) {
@@ -584,12 +611,18 @@ paymentForm?.addEventListener("submit", async (event) => {
 
 const installmentModal = document.querySelector("[data-installment-modal]");
 const installmentDialog = installmentModal?.querySelector("[data-installment-dialog]");
+const installmentForm = installmentModal?.querySelector("[data-installment-form]");
 const installmentOpenButtons = document.querySelectorAll("[data-installment-open]");
 const installmentCloseButtons = installmentModal?.querySelectorAll("[data-installment-close]") || [];
 const installmentPlanName = installmentModal?.querySelector("[data-installment-plan-name]");
 const installmentTotal = installmentModal?.querySelector("[data-installment-total]");
 const installmentMonthly = installmentModal?.querySelector("[data-installment-monthly]");
 const installmentTermInputs = installmentModal?.querySelectorAll('input[name="installmentTerm"]') || [];
+const installmentEmail = installmentModal?.querySelector('input[name="installmentEmail"]');
+const installmentPhone = installmentModal?.querySelector('input[name="installmentPhone"]');
+const installmentConsent = installmentModal?.querySelector('input[name="installmentConsent"]');
+const installmentStatus = installmentModal?.querySelector("[data-installment-status]");
+const installmentPrepare = installmentModal?.querySelector("[data-installment-prepare]");
 const tbankButtonHost = installmentModal?.querySelector("[data-tbank-button-host]");
 const installmentFallback = installmentModal?.querySelector("[data-tbank-fallback]");
 const installmentShopId = "71b6f5de-46e6-4695-b4cd-bdeada85e12a";
@@ -602,7 +635,29 @@ function getSelectedInstallmentTerm() {
   return [...installmentTermInputs].find((input) => input.checked) || installmentTermInputs[0];
 }
 
-function renderInstallmentButton() {
+function setInstallmentStatus(message, state = "") {
+  if (!installmentStatus) return;
+  installmentStatus.textContent = message;
+  installmentStatus.dataset.state = state;
+}
+
+function updateInstallmentPreview() {
+  const selectedPlan = paymentPlans[activeInstallmentPlan] || paymentPlans.standard;
+  const selectedTerm = getSelectedInstallmentTerm();
+  const months = Number(selectedTerm?.dataset.months || 3);
+  if (installmentMonthly) installmentMonthly.textContent = rubles.format(Math.ceil(selectedPlan.price / months));
+}
+
+function resetInstallmentButton() {
+  window.clearTimeout(installmentFallbackTimer);
+  tbankButtonHost?.replaceChildren();
+  if (tbankButtonHost) tbankButtonHost.hidden = true;
+  if (installmentPrepare) installmentPrepare.hidden = false;
+  if (installmentFallback) installmentFallback.hidden = true;
+  setInstallmentStatus();
+}
+
+function renderInstallmentButton(email, phone) {
   if (!tbankButtonHost) return;
 
   const selectedPlan = paymentPlans[activeInstallmentPlan] || paymentPlans.standard;
@@ -615,6 +670,9 @@ function renderInstallmentButton() {
     "items.0.name": productName,
     "items.0.price": String(selectedPlan.price),
     "items.0.quantity": "1",
+    "values.contact.email": email,
+    "values.contact.mobilePhone": phone,
+    promoCode,
     sum: String(selectedPlan.price)
   });
 
@@ -626,9 +684,24 @@ function renderInstallmentButton() {
   bankButton.setAttribute("subtext", `≈ ${rubles.format(monthly)} ₽ в месяц`);
   bankButton.setAttribute("shopId", installmentShopId);
   bankButton.setAttribute("showcaseId", installmentShowcaseId);
-  bankButton.setAttribute("ui-data", "view=newTab");
-  bankButton.setAttribute("payment-data", `${productData.toString()}&promoCode=${promoCode}`);
+  bankButton.setAttribute("ui-data", "useReturnLinks=true&view=newTab");
+  bankButton.setAttribute("payment-data", productData.toString());
+  bankButton.setAttribute("tabindex", "0");
+  bankButton.setAttribute("role", "button");
+  bankButton.setAttribute("aria-label", `Открыть анкету Т-Банка на ${months} месяцев`);
+  bankButton.addEventListener("click", () => {
+    trackFunnel("installment_bank_click", { plan: activeInstallmentPlan, months });
+  });
+  bankButton.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    bankButton.click();
+  });
   tbankButtonHost.replaceChildren(bankButton);
+  tbankButtonHost.hidden = false;
+  if (installmentPrepare) installmentPrepare.hidden = true;
+  setInstallmentStatus("Данные подготовлены. Нажмите кнопку банка, чтобы открыть анкету.", "success");
+  trackFunnel("installment_ready", { plan: activeInstallmentPlan, months });
 
   window.clearTimeout(installmentFallbackTimer);
   installmentFallbackTimer = window.setTimeout(() => {
@@ -636,6 +709,11 @@ function renderInstallmentButton() {
       installmentFallback.hidden = false;
     }
   }, 6000);
+
+  window.customElements?.whenDefined("tinkoff-create-button").then(() => {
+    if (installmentFallback) installmentFallback.hidden = true;
+    bankButton.focus();
+  });
 }
 
 function setInstallmentPlan(planKey) {
@@ -643,7 +721,8 @@ function setInstallmentPlan(planKey) {
   const selectedPlan = paymentPlans[activeInstallmentPlan];
   if (installmentPlanName) installmentPlanName.textContent = selectedPlan.name;
   if (installmentTotal) installmentTotal.textContent = `${rubles.format(selectedPlan.price)} ₽`;
-  renderInstallmentButton();
+  updateInstallmentPreview();
+  resetInstallmentButton();
 }
 
 function closeInstallmentModal() {
@@ -661,6 +740,7 @@ function openInstallmentModal(trigger) {
   installmentModal.classList.add("is-open");
   installmentModal.setAttribute("aria-hidden", "false");
   document.body.classList.add("payment-modal-open");
+  trackFunnel("installment_open", { plan: activeInstallmentPlan });
   window.setTimeout(() => getSelectedInstallmentTerm()?.focus(), prefersReducedMotion ? 0 : 180);
 }
 
@@ -668,7 +748,39 @@ installmentOpenButtons.forEach((button) => {
   button.addEventListener("click", () => openInstallmentModal(button));
 });
 installmentCloseButtons.forEach((button) => button.addEventListener("click", closeInstallmentModal));
-installmentTermInputs.forEach((input) => input.addEventListener("change", renderInstallmentButton));
+installmentTermInputs.forEach((input) => input.addEventListener("change", () => {
+  updateInstallmentPreview();
+  resetInstallmentButton();
+}));
+[installmentEmail, installmentPhone, installmentConsent].forEach((field) => {
+  field?.addEventListener("input", resetInstallmentButton);
+  field?.addEventListener("change", resetInstallmentButton);
+});
+
+installmentForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const email = String(installmentEmail?.value || "").trim();
+  const phone = String(installmentPhone?.value || "").trim();
+  const phoneDigits = phone.replace(/\D/g, "");
+
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    setInstallmentStatus("Укажите корректную электронную почту.", "error");
+    installmentEmail?.focus();
+    return;
+  }
+  if (phoneDigits.length < 10 || phoneDigits.length > 15) {
+    setInstallmentStatus("Укажите телефон с кодом страны.", "error");
+    installmentPhone?.focus();
+    return;
+  }
+  if (!installmentConsent?.checked) {
+    setInstallmentStatus("Подтвердите согласие с условиями и обработкой данных.", "error");
+    installmentConsent?.focus();
+    return;
+  }
+
+  renderInstallmentButton(email, phone);
+});
 
 installmentDialog?.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
@@ -678,7 +790,7 @@ installmentDialog?.addEventListener("keydown", (event) => {
   if (event.key !== "Tab") return;
 
   const focusable = [...installmentDialog.querySelectorAll("button, input, a, tinkoff-create-button")].filter(
-    (item) => !item.hasAttribute("disabled") && item.getAttribute("tabindex") !== "-1" && item.type !== "hidden"
+    (item) => !item.hasAttribute("disabled") && !item.hidden && item.getAttribute("tabindex") !== "-1" && item.type !== "hidden"
   );
   if (!focusable.length) return;
   const first = focusable[0];
@@ -693,15 +805,77 @@ installmentDialog?.addEventListener("keydown", (event) => {
   }
 });
 
-window.customElements?.whenDefined("tinkoff-create-button").then(() => {
-  if (installmentFallback) installmentFallback.hidden = true;
-});
-
 const paymentResult = new URLSearchParams(window.location.search).get("payment");
-if (paymentResult === "success") {
-  showToast("Оплата прошла. Чек придет на указанную почту.");
+
+function clearPaymentReturnParameter() {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("payment");
+  window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+}
+
+function delay(milliseconds) {
+  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+}
+
+async function verifyPaymentReturn() {
+  if (!paymentApiBase) {
+    showToast("Не удалось проверить оплату: платежный сервис недоступен.");
+    return;
+  }
+
+  const paymentId = localStorage.getItem("victoryRealtyPaymentId") || "";
+  const orderId = localStorage.getItem("victoryRealtyOrderId") || "";
+  if (!paymentId || !orderId) {
+    showToast("Оплата не подтверждена: в этом браузере нет данных заказа.");
+    trackFunnel("payment_unverified");
+    clearPaymentReturnParameter();
+    return;
+  }
+
+  showToast("Проверяем статус оплаты в банке…");
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    try {
+      const query = new URLSearchParams({ paymentId, orderId });
+      const response = await fetch(`${paymentApiBase}/api/payment/status?${query.toString()}`, {
+        headers: { Accept: "application/json" },
+        cache: "no-store"
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Status request failed");
+
+      if (result.status === "paid") {
+        showToast("Оплата подтверждена банком. Чек придет на указанную почту.");
+        trackFunnel("payment_confirmed", { plan: result.plan });
+        localStorage.removeItem("victoryRealtyPaymentId");
+        localStorage.removeItem("victoryRealtyOrderId");
+        clearPaymentReturnParameter();
+        return;
+      }
+      if (["failed", "refunded"].includes(result.status)) {
+        showToast(result.status === "refunded"
+          ? "Платеж возвращен. Если есть вопросы, свяжитесь с нами."
+          : "Оплата не завершена. Можно повторить или выбрать другой способ.");
+        trackFunnel("payment_failed", { plan: result.plan });
+        clearPaymentReturnParameter();
+        return;
+      }
+    } catch {
+      if (attempt === 5) {
+        showToast("Не удалось получить статус оплаты. Данные заказа сохранены для повторной проверки.");
+        return;
+      }
+    }
+    await delay(1800);
+  }
+
+  showToast("Банк еще обрабатывает платеж. Обновите страницу через минуту — мы не покажем успех без подтверждения банка.");
+}
+
+if (["return", "success"].includes(paymentResult)) {
+  verifyPaymentReturn();
 } else if (paymentResult === "failed") {
   showToast("Оплата не завершена. Можно повторить или выбрать другой способ.");
+  clearPaymentReturnParameter();
 }
 
 document.addEventListener("keydown", (event) => {

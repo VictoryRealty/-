@@ -9,7 +9,7 @@
   --line: rgba(9, 9, 9, 0.1);
   --line-strong: rgba(9, 9, 9, 0.18);
   --gold: #c49a4a;
-  --gold-strong: #a87d2e;
+  --gold-strong: #7f5b18;
   --gold-soft: #f3e4bd;
   --teal: #126c62;
   --wine: #8f1d18;
@@ -72,6 +72,10 @@ textarea {
 
 button {
   cursor: pointer;
+}
+
+[hidden] {
+  display: none !important;
 }
 
 :focus-visible {
@@ -431,6 +435,17 @@ button {
   font-size: clamp(2.75rem, 4.35vw, 4.7rem);
   line-height: 0.96;
   letter-spacing: 0;
+}
+
+.hero-copy h1 span {
+  display: block;
+  max-width: 19em;
+  margin-top: 0.32em;
+  color: var(--ink-soft);
+  font-family: Inter, "SF Pro Display", "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 0.42em;
+  font-weight: 680;
+  line-height: 1.22;
 }
 
 .hero-lead {
@@ -1475,6 +1490,28 @@ button {
   font-weight: 690;
 }
 
+.lead-form .form-consent {
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  cursor: pointer;
+}
+
+.lead-form .form-consent input {
+  width: 24px;
+  min-height: 24px;
+  height: 24px;
+  margin: 1px 0 0;
+  padding: 0;
+  accent-color: var(--gold-soft);
+}
+
+.lead-form .form-consent span {
+  font-size: 0.76rem;
+  font-weight: 560;
+  line-height: 1.5;
+}
+
 .lead-form input,
 .lead-form select,
 .lead-form textarea {
@@ -1808,7 +1845,7 @@ button {
 
 .payment-consent {
   display: grid;
-  grid-template-columns: 20px minmax(0, 1fr);
+  grid-template-columns: 24px minmax(0, 1fr);
   gap: 10px;
   align-items: start;
   margin-top: 16px;
@@ -1818,9 +1855,9 @@ button {
 }
 
 .payment-consent input {
-  width: 18px;
-  height: 18px;
-  margin: 2px 0 0;
+  width: 24px;
+  height: 24px;
+  margin: 1px 0 0;
   accent-color: var(--ink);
 }
 
@@ -1959,13 +1996,28 @@ button {
   font-size: 0.72rem;
 }
 
+.installment-contact-fields {
+  margin-top: 16px;
+}
+
 .tbank-button-host {
   min-height: 56px;
+  margin-top: 12px;
+}
+
+.tbank-button-host[hidden] {
+  display: none;
 }
 
 .tbank-button-host tinkoff-create-button {
   display: block;
   width: 100%;
+}
+
+.tbank-button-host tinkoff-create-button:focus-visible {
+  border-radius: var(--radius);
+  outline: 3px solid var(--gold-strong);
+  outline-offset: 3px;
 }
 
 .installment-fallback {

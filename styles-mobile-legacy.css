@@ -378,6 +378,14 @@
     text-wrap: balance;
   }
 
+  .hero-copy h1 span {
+    max-width: 18em;
+    margin-top: 0.42em;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 0.48em;
+    line-height: 1.28;
+  }
+
   .hero .eyebrow {
     color: var(--gold-soft);
   }
@@ -1216,6 +1224,37 @@
 
   .lead-form label span {
     font-size: 0.76rem;
+  }
+
+  .lead-form .form-consent span {
+    font-size: 0.72rem;
+  }
+
+  .brand,
+  .menu-button {
+    min-height: 44px;
+  }
+
+  .menu-button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .mobile-tariff-tabs button {
+    min-height: 44px;
+  }
+
+  .form-consent a,
+  .payment-consent a {
+    display: inline-block;
+    margin-block: -5px;
+    padding-block: 5px;
+  }
+
+  .footer-contacts a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
   }
 
   .lead-form input,
