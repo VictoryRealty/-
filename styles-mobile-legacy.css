@@ -1239,8 +1239,30 @@
     gap: 18px;
   }
 
+  .footer-documents {
+    gap: 0;
+    padding-top: 2px;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .footer-documents .mobile-disclosure__trigger {
+    padding: 10px 0;
+    color: var(--white);
+  }
+
+  .footer-documents .mobile-disclosure__trigger-copy {
+    color: var(--white);
+    font-size: 0.82rem;
+  }
+
+  .footer-documents .mobile-disclosure__icon {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
   .footer-legal {
     grid-column: auto;
+    gap: 8px;
+    padding: 4px 0 8px;
   }
 
   .site-footer {
