@@ -212,6 +212,114 @@ document.querySelectorAll(".faq-list details").forEach((details) => {
   });
 });
 
+const mobileDisclosureConfigs = [
+  { group: ".role-grid", item: ".role-card", source: ".compare-head", content: ".compare-list" },
+  { group: ".reasons-grid", item: ".feature-card", source: "h3", content: "p" },
+  { group: ".stack-grid", item: ".glass-card", source: "h3", content: "p" },
+  { group: ".workflow-grid", item: ".source-card", source: "h3", content: "p" },
+  { group: ".compare-grid", item: ".compare-card", source: ".compare-head", content: ".compare-list" },
+  { group: ".benefit-row", item: ".benefit-card", source: "strong", content: "span" },
+  { group: ".tariff-grid", item: ".tariff-card", content: ".pricing-list", title: "Что входит в тариф" }
+];
+const mobileDisclosureRecords = [];
+let mobileDisclosureId = 0;
+
+function setMobileDisclosure(record, isExpanded) {
+  record.item.classList.toggle("is-expanded", isExpanded);
+  record.button.setAttribute("aria-expanded", String(isExpanded));
+  record.button.setAttribute(
+    "aria-label",
+    `${record.title}. ${isExpanded ? "Скрыть подробности" : "Показать подробности"}`
+  );
+
+  if (mobileViewport.matches) {
+    record.panel.setAttribute("aria-hidden", String(!isExpanded));
+  } else {
+    record.panel.removeAttribute("aria-hidden");
+  }
+}
+
+mobileDisclosureConfigs.forEach((config) => {
+  document.querySelectorAll(config.group).forEach((group) => {
+    group.classList.add("mobile-disclosure-group");
+
+    group.querySelectorAll(config.item).forEach((item) => {
+      const directChildren = [...item.children];
+      const source = config.source
+        ? directChildren.find((child) => child.matches(config.source))
+        : null;
+      const contentNodes = directChildren.filter((child) => child.matches(config.content));
+      if (!contentNodes.length) return;
+
+      const sourceTitle = source?.querySelector("strong")?.textContent || source?.textContent;
+      const title = String(config.title || sourceTitle || "Подробнее").trim();
+      const kicker = source?.querySelector("span")?.textContent?.trim() || "";
+      const panelId = `mobile-disclosure-${++mobileDisclosureId}`;
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "mobile-disclosure__trigger";
+      button.setAttribute("aria-controls", panelId);
+      button.setAttribute("aria-expanded", "false");
+
+      const buttonCopy = document.createElement("span");
+      buttonCopy.className = "mobile-disclosure__trigger-copy";
+      if (kicker) {
+        const buttonKicker = document.createElement("small");
+        buttonKicker.textContent = kicker;
+        buttonCopy.append(buttonKicker);
+      }
+      const buttonTitle = document.createElement("span");
+      buttonTitle.textContent = title;
+      buttonCopy.append(buttonTitle);
+
+      const buttonIcon = document.createElement("span");
+      buttonIcon.className = "mobile-disclosure__icon";
+      buttonIcon.setAttribute("aria-hidden", "true");
+      buttonIcon.textContent = "+";
+      button.append(buttonCopy, buttonIcon);
+
+      const panel = document.createElement("div");
+      panel.className = "mobile-disclosure__panel";
+      panel.id = panelId;
+      const panelInner = document.createElement("div");
+      panelInner.className = "mobile-disclosure__panel-inner";
+      panel.append(panelInner);
+
+      if (source) {
+        source.classList.add("mobile-disclosure__source");
+        source.before(button);
+      } else {
+        contentNodes[0].before(button);
+      }
+      contentNodes[0].before(panel);
+      contentNodes.forEach((node) => panelInner.append(node));
+
+      item.classList.add("mobile-disclosure");
+      const record = { group, item, button, panel, title };
+      mobileDisclosureRecords.push(record);
+      setMobileDisclosure(record, false);
+
+      button.addEventListener("click", () => {
+        const shouldExpand = button.getAttribute("aria-expanded") !== "true";
+        mobileDisclosureRecords.forEach((otherRecord) => {
+          if (otherRecord.group === group && otherRecord !== record) {
+            setMobileDisclosure(otherRecord, false);
+          }
+        });
+        setMobileDisclosure(record, shouldExpand);
+      });
+    });
+  });
+});
+
+mobileViewport.addEventListener?.("change", () => {
+  mobileDisclosureRecords.forEach((record) => {
+    const isExpanded = record.button.getAttribute("aria-expanded") === "true";
+    setMobileDisclosure(record, isExpanded);
+  });
+});
+
 function showToast(message) {
   if (!toast) return;
   toast.textContent = message;

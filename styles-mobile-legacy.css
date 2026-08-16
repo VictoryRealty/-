@@ -2,8 +2,14 @@
   Purpose-built phone layout. Desktop and tablet remain in styles-base.css.
 */
 .mobile-action-dock,
-.mobile-tariff-tabs {
+.mobile-tariff-tabs,
+.mobile-disclosure__trigger {
   display: none;
+}
+
+.mobile-disclosure__panel,
+.mobile-disclosure__panel-inner {
+  display: contents;
 }
 
 @media (max-width: 680px) {
@@ -54,6 +60,129 @@
     font-size: 0.88rem;
     line-height: 1.52;
   }
+
+  .mobile-disclosure__source {
+    display: none !important;
+  }
+
+  .mobile-disclosure__trigger {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-disclosure__trigger-copy {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+    font-size: 0.94rem;
+    font-weight: 780;
+    line-height: 1.2;
+  }
+
+  .mobile-disclosure__trigger-copy small {
+    color: var(--gold-strong);
+    font-size: 0.64rem;
+    font-weight: 760;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .mobile-disclosure__icon {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    display: grid;
+    place-items: center;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-size: 1.15rem;
+    font-weight: 400;
+    line-height: 1;
+    opacity: 0.58;
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms ease;
+  }
+
+  .mobile-disclosure__trigger:focus-visible {
+    outline: 2px solid var(--gold-strong);
+    outline-offset: 4px;
+  }
+
+  .mobile-disclosure__trigger:active .mobile-disclosure__icon {
+    opacity: 1;
+  }
+
+  .mobile-disclosure.is-expanded .mobile-disclosure__icon {
+    transform: rotate(45deg);
+    opacity: 1;
+  }
+
+  .mobile-disclosure__panel {
+    min-width: 0;
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition:
+      grid-template-rows 360ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 200ms ease,
+      transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear 360ms;
+  }
+
+  .mobile-disclosure__panel-inner {
+    min-width: 0;
+    min-height: 0;
+    display: block;
+    overflow: hidden;
+  }
+
+  .mobile-disclosure.is-expanded .mobile-disclosure__panel {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+
+  .mobile-disclosure__panel .compare-list li,
+  .mobile-disclosure__panel .pricing-list li,
+  .mobile-disclosure__panel-inner > p,
+  .mobile-disclosure__panel-inner > span {
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 180ms ease, transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .mobile-disclosure.is-expanded .mobile-disclosure__panel .compare-list li,
+  .mobile-disclosure.is-expanded .mobile-disclosure__panel .pricing-list li,
+  .mobile-disclosure.is-expanded .mobile-disclosure__panel-inner > p,
+  .mobile-disclosure.is-expanded .mobile-disclosure__panel-inner > span {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .mobile-disclosure.is-expanded .mobile-disclosure__panel li:nth-child(2) { transition-delay: 35ms; }
+  .mobile-disclosure.is-expanded .mobile-disclosure__panel li:nth-child(3) { transition-delay: 70ms; }
+  .mobile-disclosure.is-expanded .mobile-disclosure__panel li:nth-child(4) { transition-delay: 105ms; }
+  .mobile-disclosure.is-expanded .mobile-disclosure__panel li:nth-child(5) { transition-delay: 140ms; }
+  .mobile-disclosure.is-expanded .mobile-disclosure__panel li:nth-child(6) { transition-delay: 175ms; }
+  .mobile-disclosure.is-expanded .mobile-disclosure__panel li:nth-child(7) { transition-delay: 210ms; }
 
   .eyebrow {
     gap: 8px;
@@ -521,7 +650,12 @@
   }
 
   .feature-card .card-icon {
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 2;
+  }
+
+  .feature-card .mobile-disclosure__trigger,
+  .feature-card .mobile-disclosure__panel {
+    grid-column: 2;
   }
 
   .card-icon {
@@ -556,7 +690,7 @@
 
   .stack-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 8px;
     margin: 0;
     padding: 0;
@@ -565,14 +699,23 @@
 
   .glass-card {
     min-width: 0;
-    min-height: 166px;
-    padding: 13px;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    column-gap: 10px;
+    padding: 12px;
     box-shadow: none;
   }
 
   .glass-card .card-icon {
     width: 32px;
     height: 32px;
+    grid-row: 1 / span 2;
+  }
+
+  .glass-card .mobile-disclosure__trigger,
+  .glass-card .mobile-disclosure__panel {
+    grid-column: 2;
   }
 
   .glass-card h3 {
@@ -617,6 +760,11 @@
     font-size: 0.72rem;
   }
 
+  .source-card .mobile-disclosure__trigger,
+  .source-card .mobile-disclosure__panel {
+    grid-column: 2;
+  }
+
   .source-card h3 {
     grid-column: 2;
     margin: 0;
@@ -655,14 +803,14 @@
   .benefit-row,
   .benefit-row--compact {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 0;
     border-top: 1px solid var(--line);
   }
 
   .benefit-card {
-    min-height: 116px;
-    padding: 12px 9px;
+    min-height: 0;
+    padding: 10px 0;
     border: 0;
     border-bottom: 1px solid var(--line);
     border-radius: 0;
@@ -676,7 +824,7 @@
 
   .benefit-card:nth-child(even) {
     padding-right: 0;
-    border-left: 1px solid var(--line);
+    border-left: 0;
   }
 
   .benefit-row--compact .benefit-card:last-child {
@@ -684,15 +832,63 @@
     min-height: auto;
   }
 
-  .benefit-card strong {
+  .benefit-card > strong {
     font-size: 0.8rem;
     line-height: 1.28;
   }
 
-  .benefit-card span {
+  .benefit-card .mobile-disclosure__panel-inner > span {
     margin-top: 6px;
     font-size: 0.7rem;
     line-height: 1.42;
+  }
+
+  .source-card .mobile-disclosure__trigger,
+  .benefit-card .mobile-disclosure__trigger {
+    color: var(--ink);
+  }
+
+  .source-card .mobile-disclosure__trigger-copy,
+  .benefit-card .mobile-disclosure__trigger-copy {
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .source-card .mobile-disclosure__trigger-copy > span,
+  .benefit-card .mobile-disclosure__trigger-copy > span {
+    margin: 0;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+
+  .source-card .mobile-disclosure__icon,
+  .benefit-card .mobile-disclosure__icon {
+    margin: 0;
+    color: inherit;
+    font-size: 1.15rem;
+    font-weight: 400;
+  }
+
+  .benefit-card .mobile-disclosure__trigger-copy {
+    font-size: 0.84rem;
+  }
+
+  .role-card .mobile-disclosure__trigger-copy,
+  .compare-card .mobile-disclosure__trigger-copy {
+    font-size: 1.18rem;
+  }
+
+  .role-card .mobile-disclosure__panel,
+  .compare-card .mobile-disclosure__panel,
+  .tariff-card .mobile-disclosure__panel {
+    width: 100%;
+  }
+
+  .section--black .mobile-disclosure__trigger-copy small,
+  .compare-card--accent .mobile-disclosure__trigger-copy small {
+    color: var(--gold-soft);
   }
 
   .benefit-media {
@@ -917,6 +1113,16 @@
     gap: 8px;
   }
 
+  .tariff-card .mobile-disclosure__trigger {
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .tariff-card .mobile-disclosure__trigger-copy {
+    font-size: 0.82rem;
+  }
+
   .pricing-list li {
     gap: 8px;
     font-size: 0.79rem;
@@ -1130,6 +1336,17 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) and (max-width: 680px) {
+  .mobile-disclosure__icon,
+  .mobile-disclosure__panel,
+  .mobile-disclosure__panel .compare-list li,
+  .mobile-disclosure__panel .pricing-list li,
+  .mobile-disclosure__panel-inner > p,
+  .mobile-disclosure__panel-inner > span {
+    transition: none !important;
+  }
+}
+
 @media (max-width: 350px) {
   .container {
     width: calc(100% - 24px);
@@ -1168,32 +1385,6 @@
   .hero .trust-strip span {
     padding-inline: 7px;
     font-size: 0.59rem;
-  }
-
-  .stack-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .glass-card {
-    min-height: 0;
-    display: grid;
-    grid-template-columns: 32px minmax(0, 1fr);
-    column-gap: 10px;
-    padding: 12px;
-  }
-
-  .glass-card .card-icon {
-    grid-row: 1 / span 2;
-  }
-
-  .glass-card h3 {
-    grid-column: 2;
-    margin: 0;
-  }
-
-  .glass-card p {
-    grid-column: 2;
-    margin-top: 4px;
   }
 
   .mobile-tariff-tabs button {
