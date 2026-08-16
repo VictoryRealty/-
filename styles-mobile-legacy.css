@@ -1397,6 +1397,17 @@
   }
 }
 
+@media (max-width: 480px) {
+  .hero-portrait {
+    background: var(--black);
+  }
+
+  .hero-portrait img {
+    object-fit: contain;
+    object-position: center top;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) and (max-width: 680px) {
   .mobile-disclosure__icon,
   .mobile-disclosure__panel,
