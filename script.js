@@ -17,6 +17,8 @@ const modalDialog = videoModal?.querySelector("[data-video-dialog]");
 const mobileDock = document.querySelector("[data-mobile-dock]");
 const mobileDockLinks = mobileDock?.querySelectorAll("a") || [];
 const applicationSection = document.querySelector("#application");
+const legalNotice = document.querySelector("[data-legal-notice]");
+const legalNoticeAccept = document.querySelector("[data-legal-notice-accept]");
 const mobileViewport = window.matchMedia("(max-width: 680px)");
 const tariffTabs = document.querySelector("[data-tariff-tabs]");
 const tariffTabButtons = tariffTabs?.querySelectorAll("[data-tariff-tab]") || [];
@@ -50,10 +52,12 @@ function setMobileDockState() {
     applicationRect && applicationRect.top < window.innerHeight * 0.78 && applicationRect.bottom > 0
   );
   const menuIsOpen = nav?.classList.contains("is-open");
+  const legalNoticeIsOpen = Boolean(legalNotice && !legalNotice.hidden);
   const isVisible = mobileViewport.matches
     && window.scrollY > Math.max(460, window.innerHeight * 0.66)
     && !applicationInView
-    && !menuIsOpen;
+    && !menuIsOpen
+    && !legalNoticeIsOpen;
 
   mobileDock.classList.toggle("is-visible", isVisible);
   mobileDock.setAttribute("aria-hidden", String(!isVisible));
@@ -117,6 +121,41 @@ function setHeaderState() {
 }
 
 setHeaderState();
+
+function hasAcceptedLegalNotice() {
+  try {
+    return window.localStorage.getItem("victoryRealtyLegalNoticeAcceptedV1") === "1";
+  } catch {
+    return false;
+  }
+}
+
+function showLegalNotice() {
+  if (!legalNotice || hasAcceptedLegalNotice()) return;
+  legalNotice.hidden = false;
+  window.requestAnimationFrame(() => {
+    legalNotice.classList.add("is-visible");
+    setMobileDockState();
+  });
+}
+
+function dismissLegalNotice() {
+  if (!legalNotice) return;
+  try {
+    window.localStorage.setItem("victoryRealtyLegalNoticeAcceptedV1", "1");
+  } catch {
+    // The notice can still be dismissed for this page if storage is unavailable.
+  }
+  legalNotice.classList.remove("is-visible");
+  window.setTimeout(() => {
+    legalNotice.hidden = true;
+    setMobileDockState();
+  }, prefersReducedMotion ? 0 : 240);
+}
+
+legalNoticeAccept?.addEventListener("click", dismissLegalNotice);
+showLegalNotice();
+
 window.addEventListener("scroll", setHeaderState, { passive: true });
 window.addEventListener("resize", setHeaderState);
 
