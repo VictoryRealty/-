@@ -23,6 +23,7 @@ const mobileViewport = window.matchMedia("(max-width: 680px)");
 const tariffTabs = document.querySelector("[data-tariff-tabs]");
 const tariffTabButtons = tariffTabs?.querySelectorAll("[data-tariff-tab]") || [];
 const tariffCards = document.querySelectorAll("[data-tariff-card]");
+const copyProtectedAreas = document.querySelectorAll("[data-copy-protected]");
 let lastVideoTrigger = null;
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -382,6 +383,35 @@ function showToast(message) {
     toast.classList.remove("is-visible");
   }, 4200);
 }
+
+function closestCopyProtectedArea(target) {
+  const element = target instanceof Element ? target : target?.parentElement;
+  return element?.closest?.("[data-copy-protected]") || null;
+}
+
+function selectionTouchesCopyProtectedArea() {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return false;
+  return Boolean(
+    closestCopyProtectedArea(selection.anchorNode)
+    || closestCopyProtectedArea(selection.focusNode)
+  );
+}
+
+document.addEventListener("copy", (event) => {
+  if (!closestCopyProtectedArea(event.target) && !selectionTouchesCopyProtectedArea()) return;
+  event.preventDefault();
+  showToast("Копирование этого раздела отключено.");
+});
+
+copyProtectedAreas.forEach((area) => {
+  area.addEventListener("selectstart", (event) => event.preventDefault());
+  area.addEventListener("dragstart", (event) => event.preventDefault());
+  area.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+    showToast("Копирование этого раздела отключено.");
+  });
+});
 
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();

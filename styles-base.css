@@ -88,6 +88,13 @@ button {
   color: var(--ink);
 }
 
+[data-copy-protected],
+[data-copy-protected] * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
 .svg-sprite {
   position: absolute;
   width: 0;
@@ -3018,7 +3025,7 @@ button {
     padding-right: 0;
   }
 
-  .founder-facts div:nth-child(n + 3) {
+  .founder-facts div:nth-child(n + 5) {
     border-bottom: 0;
   }
 
