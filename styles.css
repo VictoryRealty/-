@@ -3,5 +3,5 @@
   Mobile-only restoration is isolated in styles-mobile-legacy.css so it can
   be adjusted or removed without touching the desktop design.
 */
-@import url("./styles-base.css?v=20260820-victoria-copy-legal-v1");
-@import url("./styles-mobile-legacy.css?v=20260820-victoria-copy-legal-v1");
+@import url("./styles-base.css?v=20260822-victoria-full-review-v2");
+@import url("./styles-mobile-legacy.css?v=20260822-victoria-full-review-v2");
