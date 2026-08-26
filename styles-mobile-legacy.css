@@ -817,27 +817,26 @@
   .benefit-row--compact {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 0;
-    border-top: 1px solid var(--line);
+    gap: 8px;
+    border-top: 0;
   }
 
   .benefit-card {
     min-height: 0;
-    padding: 10px 0;
-    border: 0;
-    border-bottom: 1px solid var(--line);
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.78);
+    box-shadow: 0 10px 26px rgba(9,9,9,0.045);
   }
 
   .benefit-card:nth-child(odd) {
-    padding-left: 0;
+    padding: 14px;
   }
 
   .benefit-card:nth-child(even) {
     padding-right: 0;
-    border-left: 0;
+    padding: 14px;
   }
 
   .benefit-row--compact .benefit-card:last-child {
@@ -846,29 +845,28 @@
   }
 
   .benefit-card > strong {
-    font-size: 0.8rem;
+    font-size: 0.86rem;
     line-height: 1.28;
   }
 
-  .benefit-card .mobile-disclosure__panel-inner > span {
+  .benefit-card > span {
+    display: block;
     margin-top: 6px;
-    font-size: 0.7rem;
-    line-height: 1.42;
+    color: var(--muted);
+    font-size: 0.74rem;
+    line-height: 1.45;
   }
 
-  .source-card .mobile-disclosure__trigger,
-  .benefit-card .mobile-disclosure__trigger {
+  .source-card .mobile-disclosure__trigger {
     color: var(--ink);
   }
 
-  .source-card .mobile-disclosure__trigger-copy,
-  .benefit-card .mobile-disclosure__trigger-copy {
+  .source-card .mobile-disclosure__trigger-copy {
     margin: 0;
     color: var(--ink);
   }
 
-  .source-card .mobile-disclosure__trigger-copy > span,
-  .benefit-card .mobile-disclosure__trigger-copy > span {
+  .source-card .mobile-disclosure__trigger-copy > span {
     margin: 0;
     color: inherit;
     font-size: inherit;
@@ -876,16 +874,11 @@
     line-height: inherit;
   }
 
-  .source-card .mobile-disclosure__icon,
-  .benefit-card .mobile-disclosure__icon {
+  .source-card .mobile-disclosure__icon {
     margin: 0;
     color: inherit;
     font-size: 1.15rem;
     font-weight: 400;
-  }
-
-  .benefit-card .mobile-disclosure__trigger-copy {
-    font-size: 0.84rem;
   }
 
   .role-card .mobile-disclosure__trigger-copy,
@@ -1185,6 +1178,14 @@
     padding: 0 13px 14px;
     font-size: 0.78rem;
     line-height: 1.5;
+  }
+
+  .faq-list .faq-answer {
+    padding: 0 13px 14px;
+  }
+
+  .faq-list .faq-answer p {
+    padding: 0;
   }
 
   .final-grid {

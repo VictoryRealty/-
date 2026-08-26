@@ -271,7 +271,6 @@ const mobileDisclosureConfigs = [
   { group: ".stack-grid", item: ".glass-card", source: "h3", content: "p" },
   { group: ".workflow-grid", item: ".source-card", source: "h3", content: "p" },
   { group: ".compare-grid", item: ".compare-card", source: ".compare-head", content: ".compare-list" },
-  { group: ".benefit-row", item: ".benefit-card", source: "strong", content: "span" },
   { group: ".tariff-grid", item: ".tariff-card", content: ".pricing-list", title: "Что входит в тариф" },
   { group: ".footer-shell", item: ".footer-documents", source: ".footer-documents__title", content: ".footer-legal" }
 ];
