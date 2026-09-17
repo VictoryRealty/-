@@ -30,6 +30,35 @@ const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)
 const submitButton = form?.querySelector("button[type='submit']");
 const submitLabel = submitButton?.querySelector("[data-submit-label]");
 const paymentApiBase = String(document.querySelector('meta[name="payment-api"]')?.content || "").replace(/\/$/, "");
+const formSubmitEndpoint = "https://formsubmit.co/ajax/rappy@yandex.ru";
+
+async function sendLeadEmailCopy(payload) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 10000);
+  try {
+    const response = await fetch(formSubmitEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        name: payload.name,
+        phone: payload.phone,
+        channel: payload.channel,
+        experience: payload.experience,
+        source: payload.source,
+        submittedAt: new Date().toLocaleString("ru-RU"),
+        _subject: "Новая заявка на обучение брокеров",
+        _template: "table",
+        _captcha: "false",
+        _url: payload.source
+      }),
+      keepalive: true,
+      signal: controller.signal
+    });
+    if (!response.ok) throw new Error("FormSubmit request failed");
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
 
 function trackFunnel(event, details = {}) {
   if (!paymentApiBase) return;
@@ -462,6 +491,8 @@ form?.addEventListener("submit", async (event) => {
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || "Lead request failed");
+
+    sendLeadEmailCopy(payload).catch(() => {});
 
     form.reset();
     if (channelSelect) channelSelect.value = "Telegram";
